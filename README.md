@@ -53,7 +53,7 @@ linkOpener.js:
 nametagToggle.js:
 
 	Features: Adds a hotkey to toggle nametags, also displays on/off messages in chat.
-	Usage: Configure your hotkey in the idkr settings tab by opening regular settings and placing a key in the input field (Ex: F2, k). Case sensitive, so upper letters only 	  work when tablock is active or shift is pressed.
+	Usage: Configure your hotkey in the idkr settings tab by opening regular settings and placing a key in the input field (Ex: F2, k). Case sensitive, so upper letters only work when tablock is active or shift is pressed.
 	Toggleable: yes, can be turned off by not setting a value.
 	Styling: none
 
@@ -67,7 +67,7 @@ specQOL:
 
 socialTagButton.js:
 
-	Features: Adds a tag button on profiles. If clicked, it tags the user (if tagged it doesn't untag), also reports user with clipboard content and puts profile link and    	  clipboard content into a text file for logging purpose. Also has a button whcih opens reports section, opens every report and highlights every link.
+	Features: Adds a tag button on profiles. If clicked, it tags the user (if tagged it doesn't untag), also reports user with clipboard content and puts profile link and    clipboard content into a text file for logging purpose. Also has a button whcih opens reports section, opens every report and highlights every link.
 	Usage: First, open source code file and change the path to your logs file. After that's done copy evidence into clipboard, press the button. Thats it.
 	Toggleable: no
 	Issues: If you don't open a players profile link but instead go on market, hub, etc. first, then click on a profile, the button doesn't appear. It might also disappear after a tag has been executed, but it doesn't really matter.
@@ -83,7 +83,7 @@ suspectDisplay.js:
 suspectFocus.js:
 
 	Features: Adds a hotkey to toggle focussing the suspect in KPD spec, also displays on/off messages in chat.
-	Usage: Configure your hotkey in the idkr settings tab by opening regular settings and placing a key in the input field (Ex: F1, k). Case sensitive, so upper letters only  	   work when tablock is active or shift is pressed.
+	Usage: Configure your hotkey in the idkr settings tab by opening regular settings and placing a key in the input field (Ex: F1, k). Case sensitive, so upper letters only  work when tablock is active or shift is pressed.
 	Toggleable: yes, can be turned off by not setting a value.
 	Styling: none
 	Requires: kpdQOL.js, specQOL.js
