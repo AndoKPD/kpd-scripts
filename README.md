@@ -3,9 +3,11 @@ KPD Scripts by ando#6372
 USAGE:
 These scripts ONLY work in idkr client.
 Github link: https://github.com/Mixaz017/idkr
+
 I've read the source code, there's nothing bad in it (Loggers, Sniffers, etc).
 If you don't trust the precompiled version on Github, I've compiled one myself.
 Download link: https://drive.google.com/drive/folders/1g8D-imc_67QtYlK8ootNWqCgz3pxgtxV?usp=sharing
+
 I will update this executable once more updates come to the idkr client.
 Put update mode on skip if you don't want auto updates.
 
@@ -33,6 +35,7 @@ linkOpener.js:
 	Toggleable: yes, can be turned off.
 	Styling: must be added to your css, IDs are #linkOpener and #linkInput.
 	(I use these)
+	
 	#linkOpener {
 		background-color: transparent;
 		text-shadow: none;
