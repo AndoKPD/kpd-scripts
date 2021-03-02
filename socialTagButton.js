@@ -72,17 +72,16 @@ function spanAppender (spanElem) {
 
 
 
-
-
 function applyCSS() { //puts the needed styling in the css
 	document.head.appendChild(Object.assign(document.createElement('style'), {
 			innerText: `#tagBtn {
-							color: #ffffff!important;
+							color: black;
 							pointer-events: all;
 							cursor: pointer;
 							-webkit-transition: all .2s;
 							transition: all .2s;
 							font-size: 32px;
+							text-shadow: 0 0 3px white;
 						}
 						#tagBtn:hover {
 							-webkit-transform: scale(.95);
@@ -91,8 +90,8 @@ function applyCSS() { //puts the needed styling in the css
 							-webkit-filter: contrast(1.5);
 						}
 						#openRptBtn {
-							color: #ffffff;
-							border-color: var(--accent) !important;
+							color: var(--red);
+							border-color: var(--red);
 						}
 						.reportText > a[href^="https://krunker.io/?game="] {
 							color: white;
