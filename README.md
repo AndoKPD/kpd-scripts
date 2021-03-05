@@ -14,7 +14,7 @@ Put update mode on skip if you don't want auto updates.
 
 ENABLE USERSCRIPTS IN SETTINGS
 
-To use userscipts, copy the .js files to <Documents>/idkr/scripts where <Documents> is your Documents folder.
+To use userscipts, copy the .js files to Documents/idkr/scripts.
 
 IF YOU CHANGE SOMETHING IN THE SETTINGS OR THE SOURCE CODE, RELOAD THE WINDOW!
 
