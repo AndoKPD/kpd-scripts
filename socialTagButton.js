@@ -93,7 +93,7 @@ function applyCSS() { //puts the needed styling in the css
 							color: var(--red);
 							border-color: var(--red);
 						}
-						.reportText > a[href^="https://krunker.io/?game="] {
+						.reportText > a[href^="https://krunker.io/"] {
 							color: white;
 						}
 						.reportText > a {
