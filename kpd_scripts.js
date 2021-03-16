@@ -71,7 +71,7 @@ const callInfoObserver = new MutationObserver(() => {
 		profLVL = sessionStorage.getItem('suspectLVL');
 		if(senior) {
 			if(profLVL < 15) {
-				const text = '\n\n' + profName;
+				const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
 				fs.appendFile(path, text, (err) => {
 					if (err) {
 						throw err;
