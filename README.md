@@ -20,15 +20,51 @@ IF YOU CHANGE SOMETHING IN THE SETTINGS OR THE SOURCE CODE, RELOAD THE WINDOW!
 
 UNDERSTANDING THE SCRIPTS:
 
-(for more details check the source code of each script)
+Alt Menu Logger:
 
-kpdQOL.js:
+	Features: Adds log button to the alt menu. Becomes green once clicked.
+	Toggleable: yes, can be turned off.
+	Styling: styled in the source code.
+
+
+KPD QOL:
 
 	Features: Adds search bar to call list and ban logs, highlights calls based on your preference, adds the calls region.
 	Background: Prepares data for display when joining a call.
 	Usage: Configure your preferences in the source code by opening it in a text editor (constants at the top).
 	Toggleable: yes, can be turned off.
 	Styling: styled in the source code.
+	
+Nametag Hider:
+
+	Features: Adds a hotkey to toggle nametags, also displays on/off messages in chat.
+	Usage: Configure your hotkey in the idkr settings tab by opening regular settings and placing a key in the input field (Ex: F2, k). Case sensitive, so upper letters only work when tablock is active or shift is pressed.
+	Toggleable: yes, can be turned off by not setting a value.
+	Styling: none
+
+Spectate QOL:
+
+	Features: Highlights caller and suspect in spectator mode. Optional, automatically jump to the suspect.
+	Usage: nothing required
+	Toggleable: yes, can be turned off.
+	Styling: styled in the source code.
+	Requires: kpdQOL.js, suspectFocus.js
+	
+Suspect Display:
+
+	Features: Shows suspect and caller in KPD spec.
+	Background: Detects if you tag or not, if yes it opens suspects profile (optional) or log the tag (optional), if no it opens KPD window.
+	Usage: Open source code file and change the path to your logs file.
+	Toggleable: yes, can be turned off
+
+Suspect Focus:
+
+	Features: Adds a hotkey to toggle focussing the suspect in KPD spec, also displays on/off messages in chat.
+	Usage: Configure your hotkey in the idkr settings tab by opening regular settings and placing a key in the input field (Ex: F1, k). Case sensitive, so upper letters only  work when tablock is active or shift is pressed.
+	Toggleable: yes, can be turned off by not setting a value.
+	Styling: none
+	Requires: kpdQOL.js, specQOL.js
+	
 
 linkOpener.js:
 
@@ -50,20 +86,6 @@ linkOpener.js:
 		position: absolute;
 	}
 	
-nametagToggle.js:
-
-	Features: Adds a hotkey to toggle nametags, also displays on/off messages in chat.
-	Usage: Configure your hotkey in the idkr settings tab by opening regular settings and placing a key in the input field (Ex: F2, k). Case sensitive, so upper letters only work when tablock is active or shift is pressed.
-	Toggleable: yes, can be turned off by not setting a value.
-	Styling: none
-
-specQOL:
-
-	Features: Highlights caller and suspect in spectator mode. Optional, automatically jump to the suspect.
-	Usage: nothing required
-	Toggleable: yes, can be turned off.
-	Styling: styled in the source code.
-	Requires: kpdQOL.js, suspectFocus.js
 
 socialTagButton.js:
 
@@ -73,19 +95,5 @@ socialTagButton.js:
 	Issues: If you don't open a players profile link but instead go on market, hub, etc. first, then click on a profile, the button doesn't appear. It might also disappear after a tag has been executed, but it doesn't really matter.
 	WARNING: No promt to confirm or anything, pressing the button tags. Be careful.
 
-suspectDisplay.js:
 
-	Features: Shows suspect and caller in KPD spec.
-	Background: Detects if you tag or not, if yes it opens suspects profile (optional) or log the tag (optional), if no it opens KPD window.
-	Usage: Open source code file and change the path to your logs file.
-	Toggleable: yes, can be turned off
-
-suspectFocus.js:
-
-	Features: Adds a hotkey to toggle focussing the suspect in KPD spec, also displays on/off messages in chat.
-	Usage: Configure your hotkey in the idkr settings tab by opening regular settings and placing a key in the input field (Ex: F1, k). Case sensitive, so upper letters only  work when tablock is active or shift is pressed.
-	Toggleable: yes, can be turned off by not setting a value.
-	Styling: none
-	Requires: kpdQOL.js, specQOL.js
-	
 Enjoy :) 
