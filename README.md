@@ -5,7 +5,8 @@ These scripts ONLY work in idkr client.
 Github link: https://github.com/Mixaz017/idkr
 
 I've read the source code, there's nothing bad in it (Loggers, Sniffers, etc).
-If you don't trust the precompiled version on Github, I've compiled one myself.
+Compiled verions are automatically made by Github (Actions tab), so the dev can't include harmful code.
+If you still don't trust the version on Github, I've compiled one myself.
 Download link: https://drive.google.com/drive/folders/1g8D-imc_67QtYlK8ootNWqCgz3pxgtxV?usp=sharing
 
 I will update this executable once more updates come to the idkr client.
