@@ -4,12 +4,15 @@ const path = 'C:\\Users\\example\\Desktop\\banlog.txt'; //path to your desktop o
 const { clipboard } = require('electron');
 const minLVL = 75; //configure to your liking
 const highlightColor = 'red'; //configure to your liking
+const senior = true; //additional features if senior officer
 
 /*Global Variables*/
 
 let activeTab;
 let nametagState = true;
 let focusState = true;
+let profName;
+let profLVL;
 
 /*Mutation Observers*/
 
@@ -64,16 +67,28 @@ const specObserver = new MutationObserver(() => {
 
 const callInfoObserver = new MutationObserver(() => {
 	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
-		let profName = sessionStorage.getItem('suspect');
-		openURL('/social.html?p=profile&q='+profName);
-		remSessStorage();
-		/*const text = '\n\n' + profLink + '\n';
-		fs.appendFile(path, text, (err) => {
-			if (err) {
-				throw err;
+		profName = sessionStorage.getItem('suspect');
+		profLVL = sessionStorage.getItem('suspectLVL');
+		if(senior) {
+			if(profLVL < 15) {
+				const text = '\n\n' + profName;
+				fs.appendFile(path, text, (err) => {
+					if (err) {
+						throw err;
+					}
+					console.log("Tag logged.");
+				});
+				remSessStorage();
+				document.exitPointerLock();
+				setTimeout( function() { shoPolicePop(); }, 200);
+			} else {
+				remSessStorage();
+				openURL('/social.html?p=profile&q='+profName);
 			}
-			console.log("Tag logged.");
-		});*/
+		} else {
+			remSessStorage();
+			openURL('/social.html?p=profile&q='+profName);
+		}
 	}else if(document.getElementById('specKPDTxt').innerHTML == 'Case submitted!') {
 		console.log('not cheating');
 		remSessStorage();
@@ -240,25 +255,26 @@ function searchCalls() {
 } 
 
 function highlight() { //highlights calls
-	if(document.getElementsByClassName('kpdRepLvl').length != 0) { //if data is present
+	if(document.getElementById('kpdCalls').childNodes.length != 0 && document.getElementsByClassName('kpdRepLvl').length != 0) { //if data is present
 		console.log('highlighting');
-		let lvl = document.getElementsByClassName('kpdRepLvl');
+		let lvl = document.getElementById('kpdCalls').childNodes;
 		for(let i = 0; i < lvl.length; i++){
-			if(lvl[i].innerHTML.includes('/')) continue; //if current div is not a level, skip
-			if(lvl[i].innerHTML < minLVL) continue; //if current div is a level but below configured minimum, skip
-			lvl[i].style.color = highlightColor; //highlight the number
+			if(lvl[i].childNodes[1].innerHTML >= minLVL) lvl[i].childNodes[1].style.color = highlightColor; //highlight the number
+			if(senior && lvl[i].childNodes[4].innerHTML < 15) lvl[i].childNodes[4].style.color = '#63de26';
 		}
 	}else {
 		setTimeout(highlight, 20); //try again
 	}	
 }
 
-function joinKPD(joinFunc, caller, suspect) {
+function joinKPD(joinFunc, caller, suspect, suspectLVL) {
 	console.log(joinFunc);
 	console.log(caller);
 	console.log(suspect);
+	console.log(suspectLVL);
 	sessionStorage.setItem('caller', caller);
 	sessionStorage.setItem('suspect', suspect);
+	sessionStorage.setItem('suspectLVL', suspectLVL);
 	sessionStorage.setItem('initSpec', 'true');
 	const f = new Function(joinFunc);
 	f();
@@ -270,7 +286,7 @@ function joinButtonHook() {
 		let jBtns = document.getElementsByClassName('policeJoinB');
 		for(let i = 0; i < jBtns.length; i++){
 			if(jBtns[i].parentElement.childNodes[1].className != 'callRegion') addRegion(jBtns[i]);
-			jBtns[i].onclick = function() { joinKPD(jBtns[i].getAttribute('onclick'), jBtns[i].parentElement.parentElement.childNodes[2].innerHTML, jBtns[i].parentElement.parentElement.childNodes[5].innerHTML) };
+			jBtns[i].onclick = function() { joinKPD(jBtns[i].getAttribute('onclick'), jBtns[i].parentElement.parentElement.childNodes[2].innerHTML, jBtns[i].parentElement.parentElement.childNodes[5].innerHTML, jBtns[i].parentElement.parentElement.childNodes[4].innerHTML) };
 		}
 	}else {
 		setTimeout(joinButtonHook, 20);
@@ -340,6 +356,7 @@ function remSessStorage() {
 	}
 	sessionStorage.removeItem('caller');
 	sessionStorage.removeItem('suspect');
+	sessionStorage.removeItem('suspectLVL');
 	sessionStorage.removeItem('initSpec');
 }
 
