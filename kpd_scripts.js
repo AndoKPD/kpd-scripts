@@ -78,8 +78,7 @@ const callInfoObserver = new MutationObserver(() => {
 					const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
 					writeToFile(text);
 					remSessStorage();
-					document.exitPointerLock();
-					setTimeout( function() { shoPolicePop(); }, 200);
+					openKPDMenu();
 				} else {
 					remSessStorage();
 					openURL('/social.html?p=profile&q='+profName);
@@ -92,8 +91,7 @@ const callInfoObserver = new MutationObserver(() => {
 	}else if(document.getElementById('specKPDTxt').innerHTML == 'Case submitted!') {
 		console.log('not cheating');
 		remSessStorage();
-		document.exitPointerLock();
-		setTimeout( function() { shoPolicePop(); }, 200);
+		openKPDMenu();
 	}else if(document.getElementById('specKPDTxt').innerHTML == 'Is ' + profName + ' hacking? Caller: ' + caller) {
 		//if(sessionStorage.getItem('suspect') == null) document.getElementById('specKPDTxt').innerHTML = 'Suspect left the game';
 	}else if(document.getElementById('specKPDTxt').innerHTML.includes('Is Suspect hacking?') || (document.getElementById('specKPDTxt').innerHTML.includes('Is') && document.getElementById('specKPDTxt').innerHTML.includes('hacking?'))) {
@@ -390,6 +388,11 @@ function execCopy(elem) {
 	setTimeout(function() { elem.innerHTML = name }, 800);
 }
 
+function openKPDMenu() {
+	document.exitPointerLock();
+	setTimeout( function() { shoPolicePop(); }, 200);
+}
+
 /*Modules*/
 
 module.exports = {
@@ -500,8 +503,22 @@ module.exports = {
             set: value => {
                 senior = value;
             }
+		},
+		openKPD: {
+		name: "Open KPD",
+            id: "openKPD",
+            cat: "KPD",
+            type: 'checkbox',
+            val: true,
+            placeholder: 'F3',
+            html: function(){ return clientUtil.genCSettingsHTML(this); },
+			set: value => {
+                if(value) {
+						document.addEventListener("keydown", (e) => ((e.key === 'i' || e.key === 'I') && (openKPDMenu())));
+				}
+            }
 		}
-    },
+	},
     "run": config => {
         let hotkey1 = config.get("nametagHider", true)
         let hotkey2 = config.get("suspectFocus", true)
@@ -511,5 +528,5 @@ module.exports = {
         if (hotkey2 !== "") {
 			document.addEventListener("keydown", (e) => ((e.key === hotkey2) && (toggleFocus())));
 		}
-    }
-  };
+    },
+}
