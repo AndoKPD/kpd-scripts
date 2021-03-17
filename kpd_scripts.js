@@ -4,15 +4,13 @@ const path = 'C:\\Users\\example\\Desktop\\banlog.txt'; //path to your desktop o
 const { clipboard } = require('electron');
 const minLVL = 75; //configure to your liking
 const highlightColor = 'red'; //configure to your liking
-const senior = true; //additional features if senior officer
 
 /*Global Variables*/
 
 let activeTab;
 let nametagState = true;
 let focusState = true;
-let profName;
-let profLVL;
+let senior;
 
 /*Mutation Observers*/
 
@@ -67,37 +65,40 @@ const specObserver = new MutationObserver(() => {
 
 const callInfoObserver = new MutationObserver(() => {
 	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
-		profName = sessionStorage.getItem('suspect');
-		profLVL = sessionStorage.getItem('suspectLVL');
-		if(senior) {
-			if(profLVL < 15) {
-				const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
-				fs.appendFile(path, text, (err) => {
-					if (err) {
-						throw err;
-					}
-					console.log("Tag logged.");
-				});
-				remSessStorage();
-				document.exitPointerLock();
-				setTimeout( function() { shoPolicePop(); }, 200);
+		if(sessionStorage.getItem('suspect') != null && sessionStorage.getItem('suspectLVL') != null && sessionStorage.getItem('caller') != null) {
+			const profName = sessionStorage.getItem('suspect');
+			const profLVL = sessionStorage.getItem('suspectLVL');
+			const caller = sessionStorage.getItem('caller');
+			if(senior) {
+				if(profLVL < 15) {
+					const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
+					fs.appendFile(path, text, (err) => {
+						if (err) {
+							throw err;
+						}
+						console.log("Tag logged.");
+					});
+					remSessStorage();
+					document.exitPointerLock();
+					setTimeout( function() { shoPolicePop(); }, 200);
+				} else {
+					remSessStorage();
+					openURL('/social.html?p=profile&q='+profName);
+				}
 			} else {
 				remSessStorage();
 				openURL('/social.html?p=profile&q='+profName);
 			}
-		} else {
-			remSessStorage();
-			openURL('/social.html?p=profile&q='+profName);
 		}
 	}else if(document.getElementById('specKPDTxt').innerHTML == 'Case submitted!') {
 		console.log('not cheating');
 		remSessStorage();
 		document.exitPointerLock();
 		setTimeout( function() { shoPolicePop(); }, 200);
-	}else if(document.getElementById('specKPDTxt').innerHTML == 'Is ' + sessionStorage.getItem('suspect') + ' hacking? Caller: ' + sessionStorage.getItem('caller')) {
-		if(sessionStorage.getItem('suspect') == null) document.getElementById('specKPDTxt').innerHTML = 'Suspect left the game';
+	}else if(document.getElementById('specKPDTxt').innerHTML == 'Is ' + profName + ' hacking? Caller: ' + caller) {
+		//if(sessionStorage.getItem('suspect') == null) document.getElementById('specKPDTxt').innerHTML = 'Suspect left the game';
 	}else if(document.getElementById('specKPDTxt').innerHTML.includes('Is Suspect hacking?') || (document.getElementById('specKPDTxt').innerHTML.includes('Is') && document.getElementById('specKPDTxt').innerHTML.includes('hacking?'))) {
-		document.getElementById('specKPDTxt').innerHTML = 'Is ' + sessionStorage.getItem('suspect') + ' hacking? Caller: ' + sessionStorage.getItem('caller');
+		document.getElementById('specKPDTxt').innerHTML = 'Is ' + profName + ' hacking? Caller: ' + caller;
 	}
 });
 
@@ -458,6 +459,19 @@ module.exports = {
             placeholder: 'F1',
             html: function(){ return clientUtil.genCSettingsHTML(this); },
         },
+		seniorSet: {
+			name: 'Senior',
+			id: 'senior',
+			cat: 'KPD',
+			type: 'checkbox',
+			val: false,
+            html: function() {
+                return clientUtil.genCSettingsHTML(this)
+            },
+            set: value => {
+                senior = value;
+            }
+		}
     },
     "run": config => {
         let hotkey1 = config.get("nametagHider", true)
