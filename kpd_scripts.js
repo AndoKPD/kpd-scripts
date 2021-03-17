@@ -37,8 +37,13 @@ const kpdObserver = new MutationObserver(() => {
 				let node = genSearchBar(activeTab);
 				addSearchBar(node); 
 			}
-		}
-		else {
+		} else if(activeTab == 2) {
+			if(!document.getElementById('kpdSearch')) {
+				let node = genSearchBar(activeTab);
+				addSearchBar(node);
+			}
+			copyInit();
+		} else {
 			if(!document.getElementById('kpdSearch')) {
 				let node = genSearchBar(activeTab);
 				addSearchBar(node);
@@ -119,7 +124,8 @@ function genSearchBar() {
 function addSearchBar(searchBar) {
 	if(document.getElementById('policePopC').childNodes.length != 0) {
 		applyCSS();
-		document.getElementById('policePopC').insertBefore(searchBar, document.getElementById('policePopC').childNodes[3]);
+		let elem = document.getElementById('policePopC').insertBefore(searchBar, document.getElementById('policePopC').childNodes[3]);
+		elem.oncontextmenu = function() { elem.value = clipboard.readText(); searchCalls(); };
 		console.log('insert');
 	} else {
 		setTimeout(function() { addSearchBar(searchBar) }, 20);
@@ -220,13 +226,13 @@ function determineActiveTab(kpdHolder) {
 
 function searchCalls() { 
 	console.log('searching');
-    let inputVal = document.getElementById('kpdSearch').value 
+    let inputVal = document.getElementById('kpdSearch').value.toLowerCase(); 
     let divs = document.getElementById('kpdCalls').childNodes; 
       
     for (i = 0; i < divs.length; i++) {
 		if(activeTab == 1) {
-			let caller = divs[i].childNodes[2].innerHTML;
-			let suspect = divs[i].childNodes[5].innerHTML;
+			let caller = divs[i].childNodes[2].innerHTML.toLowerCase(); 
+			let suspect = divs[i].childNodes[5].innerHTML.toLowerCase(); 
 			let cLevel = divs[i].childNodes[1].innerHTML;
 			let sLevel = divs[i].childNodes[4].innerHTML;
 			let timeAgo = divs[i].childNodes[7].childNodes[0].innerHTML;
@@ -259,7 +265,13 @@ function highlight() { //highlights calls
 		let lvl = document.getElementById('kpdCalls').childNodes;
 		for(let i = 0; i < lvl.length; i++){
 			if(lvl[i].childNodes[1].innerHTML >= minLVL) lvl[i].childNodes[1].style.color = highlightColor; //highlight the number
-			if(senior && lvl[i].childNodes[4].innerHTML < 15) lvl[i].childNodes[4].style.color = '#63de26';
+			if(senior) {
+				if(lvl[i].childNodes[4].innerHTML < 15) {
+					lvl[i].childNodes[4].style.color = '#63de26';
+				} else {
+					lvl[i].childNodes[4].style.color = '#fc3232';
+				}
+			}
 		}
 	}else {
 		setTimeout(highlight, 20); //try again
@@ -357,6 +369,25 @@ function remSessStorage() {
 	sessionStorage.removeItem('suspect');
 	sessionStorage.removeItem('suspectLVL');
 	sessionStorage.removeItem('initSpec');
+}
+
+function copyInit(){
+	if(document.getElementById('kpdCalls').childNodes[0].childNodes.length == 6) { //if data is present
+		let divs = document.getElementById('kpdCalls').childNodes;
+		for(let i = 0; i < divs.length; i++){
+			divs[i].childNodes[0].oncontextmenu = function() { execCopy(divs[i].childNodes[0])	}
+			divs[i].childNodes[4].oncontextmenu = function() { execCopy(divs[i].childNodes[4])	}
+		}
+	}else {
+		setTimeout(copyInit, 20); //try again
+	}	
+}
+
+function execCopy(elem) {
+	let name = elem.innerHTML;
+	clipboard.writeText(name);
+	elem.innerHTML = 'Copied'
+	setTimeout(function() { elem.innerHTML = name }, 800);
 }
 
 /*Modules*/
