@@ -71,12 +71,7 @@ const callInfoObserver = new MutationObserver(() => {
 			if(senior) {
 				if(profLVL < 15) {
 					const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
-					fs.appendFile(path, text, (err) => {
-						if (err) {
-							throw err;
-						}
-						console.log("Tag logged.");
-					});
+					writeToFile(text);
 					remSessStorage();
 					document.exitPointerLock();
 					setTimeout( function() { shoPolicePop(); }, 200);
@@ -199,16 +194,20 @@ function applyCSS() {
 
 /*Custom Functions*/
 
-function logProfile() {
-	let profLink = 'https://krunker.io/social.html?p=profile&q=';
-	profLink += document.getElementById('confPop').childNodes[0].innerHTML.split(' ').reverse()[0].slice(0, -1);
-	const text = '\n\n' + profLink;
+function writeToFile(text) {
 	fs.appendFile(path, text, (err) => {
 		if (err) {
 			throw err;
 		}
 		console.log("Tag logged.");
 	});
+}
+
+function logProfile() {
+	let profLink = 'https://krunker.io/social.html?p=profile&q=';
+	profLink += document.getElementById('confPop').childNodes[0].innerHTML.split(' ').reverse()[0].slice(0, -1);
+	const text = '\n\n' + profLink;
+	writeToFile(text);
 	document.getElementsByClassName('takeActionBtn log')[0].style.backgroundColor = 'green';
 }
 
