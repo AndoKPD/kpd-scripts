@@ -4,15 +4,15 @@ const path = 'C:\\Users\\example\\Desktop\\banlog.txt'; //path to your desktop o
 const { clipboard } = require('electron');
 const minLVL = 75; //configure to your liking
 const highlightColor = 'red'; //configure to your liking
+const profName = sessionStorage.getItem('suspect');
+const profLVL = sessionStorage.getItem('suspectLVL');
+const caller = sessionStorage.getItem('caller');
 
 /*Global Variables*/
 
 let activeTab;
 let nametagState = true;
 let focusState = true;
-let profName;
-let profLVL;
-let caller;
 let senior;
 
 /*Mutation Observers*/
@@ -68,10 +68,7 @@ const specObserver = new MutationObserver(() => {
 
 const callInfoObserver = new MutationObserver(() => {
 	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
-		if(sessionStorage.getItem('suspect') != null && sessionStorage.getItem('suspectLVL') != null && sessionStorage.getItem('caller') != null) {
-			profName = sessionStorage.getItem('suspect');
-			profLVL = sessionStorage.getItem('suspectLVL');
-			caller = sessionStorage.getItem('caller');
+		if(profName != null && profLVL != null && caller != null) {
 			if(senior) {
 				if(profLVL < 15) {
 					const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
