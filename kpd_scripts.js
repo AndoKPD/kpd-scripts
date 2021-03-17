@@ -247,8 +247,8 @@ function searchCalls() {
 			} 
 		}
 		if(activeTab == 2) {
-			let tagger = divs[i].outerHTML.split('=')[5].split('>')[0];
-			let hacker = divs[i].outerHTML.split('=')[10].split('>')[0];
+			let tagger = divs[i].outerHTML.split('=')[5].split('>')[0].toLowerCase();
+			let hacker = divs[i].outerHTML.split('=')[10].split('>')[0].toLowerCase();
 			if (tagger.includes(inputVal) || hacker.includes(inputVal)) { 
 				divs[i].style.display="block";			
 			} 
