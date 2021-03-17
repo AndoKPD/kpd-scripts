@@ -10,6 +10,9 @@ const highlightColor = 'red'; //configure to your liking
 let activeTab;
 let nametagState = true;
 let focusState = true;
+let profName;
+let profLVL;
+let caller;
 let senior;
 
 /*Mutation Observers*/
@@ -66,9 +69,9 @@ const specObserver = new MutationObserver(() => {
 const callInfoObserver = new MutationObserver(() => {
 	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
 		if(sessionStorage.getItem('suspect') != null && sessionStorage.getItem('suspectLVL') != null && sessionStorage.getItem('caller') != null) {
-			const profName = sessionStorage.getItem('suspect');
-			const profLVL = sessionStorage.getItem('suspectLVL');
-			const caller = sessionStorage.getItem('caller');
+			profName = sessionStorage.getItem('suspect');
+			profLVL = sessionStorage.getItem('suspectLVL');
+			caller = sessionStorage.getItem('caller');
 			if(senior) {
 				if(profLVL < 15) {
 					const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
