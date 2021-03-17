@@ -12,7 +12,6 @@ const caller = sessionStorage.getItem('caller');
 
 let activeTab;
 let nametagState = true;
-let focusState = true;
 let senior;
 
 /*Mutation Observers*/
@@ -309,13 +308,13 @@ function toggleNames() {
 }
 
 function toggleFocus() {
-	if(focusState) {
-		sessionStorage.setItem('suspectFocus', 'on');
+	if(localStorage.getItem('suspectFocus') == null) {
+		localStorage.setItem('suspectFocus', 'on');
 		genChatMsg('Suspect focus is on');
         console.log('on');
         focusState = false;
 	} else {
-		sessionStorage.removeItem('suspectFocus');
+		localStorage.removeItem('suspectFocus');
 		if(window.focusInterval != undefined && window.focusInterval != 'undefined'){
 			window.clearInterval(window.focusInterval);
 			console.log('focusInterval cleared');
@@ -336,7 +335,7 @@ function specHighlighter(divs) {
 		}else if(divs[i].childNodes[2].innerHTML == sessionStorage.getItem('suspect')) {
 			divs[i].childNodes[2].style.color = 'red';
 			divs[i].childNodes[2].style.textShadow = 'none';
-			if(sessionStorage.getItem('suspectFocus') != null) {
+			if(localStorage.getItem('suspectFocus') != null) {
 				window.focusInterval = setInterval(function() { focusPlayer(divs[i].childNodes[3].innerHTML); }, 1000);	
 			}
 			console.log('suspect found');
