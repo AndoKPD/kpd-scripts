@@ -192,6 +192,16 @@ function applyCSS() {
 						}
 						#chatMsg_toggle {
 							color: #fc03ec;
+						}
+						#specKPDCaller {
+							display: inline-block !important; 
+							color: rgb(19, 93, 216) !important;
+							font-size: 49px!important;
+							vertical-align: middle;
+							text-shadow: -1px -1px 0 #202020, 1px -1px 0 #202020, -1px 1px 0 #202020, 1px 1px 0 #202020;
+							position: absolute;
+							top: 1px;
+							left: 12px;
 						}`
 	}))
 }
@@ -341,6 +351,9 @@ function specHighlighter(divs) {
 			console.log('caller found');
 			divs[i].childNodes[2].style.color = '#135DD8';
 			divs[i].childNodes[2].style.textShadow = 'none';
+			divs[i].childNodes[5].innerHTML = 'call';
+			divs[i].childNodes[5].id = 'specKPDCaller';
+			applyCSS();
 		}else if(divs[i].childNodes[2].innerHTML == sessionStorage.getItem('suspect')) {
 			divs[i].childNodes[2].style.color = 'red';
 			divs[i].childNodes[2].style.textShadow = 'none';
