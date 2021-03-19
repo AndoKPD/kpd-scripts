@@ -193,7 +193,7 @@ function searchCalls() {
 } 
 
 function highlight() { //highlights calls
-	if(document.getElementById('kpdCalls').childNodes.length != 0 && document.getElementsByClassName('kpdRepLvl').length != 0) { //if data is present
+	if(document.getElementById('kpdCalls').childElementCount != 0 && document.getElementsByClassName('kpdRepLvl').length != 0) { //if data is present
 		console.log('highlighting');
 		let lvl = document.getElementById('kpdCalls').childNodes;
 		for(let i = 0; i < lvl.length; i++){
@@ -247,7 +247,7 @@ function genSearchBar() {
 }
 
 function addSearchBar(searchBar) {
-	if(document.getElementById('policePopC').childNodes.length != 0) {
+	if(document.getElementById('policePopC').childElementCount != 0) {
 		let elem = document.getElementById('policePopC').insertBefore(searchBar, document.getElementById('policePopC').childNodes[3]);
 		elem.oncontextmenu = function() { elem.value = clipboard.readText(); searchCalls(); };
 		console.log('insert');
@@ -275,7 +275,7 @@ function addRegion(joinButton) {
 }
 
 function copyInit(){
-	if(document.getElementById('kpdCalls').childNodes[0].childNodes.length == 6) { //if data is present
+	if(document.getElementById('kpdCalls').childNodes[0].childElementCount == 6) { //if data is present
 		let divs = document.getElementById('kpdCalls').childNodes;
 		for(let i = 0; i < divs.length; i++){
 			divs[i].childNodes[0].oncontextmenu = function() { execCopy(divs[i].childNodes[0])	}
