@@ -31,7 +31,7 @@ A new user will be greeted like this.
 
 Set your preferences and reload the window (F5 or F6).
 
-other idkr keyboard shortcuts are found here: https://github.com/Mixaz017/idkr#keyboard-shortcuts
+Other idkr keyboard shortcuts are found here: https://github.com/Mixaz017/idkr#keyboard-shortcuts
 
 UNDERSTANDING THE SETTINGS:
 
