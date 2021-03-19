@@ -51,6 +51,10 @@ function applyCSS() {
 			innerText: `#settingsTabLayout {
 							grid-template-columns: auto auto auto auto auto auto auto;
 						}
+						#specKPDContr {
+							width: 700px;
+							height: 105px;
+						}
 						#kpdSearch {
 							background-color: transparent;
 							box-shadow: 0 0 7px 1px var(--accent);
@@ -573,7 +577,7 @@ module.exports = {
             }
         },
 		linkOpener: {
-			name: 'Show Open Link button',
+			name: 'Show Open Link Button',
 			id: 'linkOpener',
 			cat: 'KPD',
 			type: 'checkbox',
@@ -599,8 +603,10 @@ module.exports = {
             placeholder: 'Empty = F1',
             html: function(){ return clientUtil.genCSettingsHTML(this); },
 			set: value => {
-				if (value !== '') {
-					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase() || e.key === 'F1' ) && (toggleFocus())));
+				if (value === '') {
+					document.addEventListener('keydown', (e) => ((e.key === 'F1' ) && (toggleFocus())));
+				} else {
+					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase()) && (toggleFocus())));
 				}
 			}
         },
@@ -613,8 +619,10 @@ module.exports = {
             placeholder: 'Empty = F2',
             html: function(){ return clientUtil.genCSettingsHTML(this); },
 			set: value => {
-				if (value !== '') {
-					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase() || e.key === 'F2') && (toggleNames())));
+				if (value === '') {
+					document.addEventListener('keydown', (e) => ((e.key === 'F1' ) && (toggleNames())));
+				} else {
+					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase()) && (toggleNames())));
 				}
 			}
         },
@@ -627,8 +635,10 @@ module.exports = {
             placeholder: 'Empty = F3',
             html: function(){ return clientUtil.genCSettingsHTML(this); },
 			set: value => {
-				if (value !== '') {
-					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase() || e.key === 'F3' ) && (openKPDMenu())));
+				if (value === '') {
+					document.addEventListener('keydown', (e) => ((e.key === 'F1' ) && (openKPDMenu())));
+				} else {
+					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase()) && (openKPDMenu())));
 				}
 			}
 		},
