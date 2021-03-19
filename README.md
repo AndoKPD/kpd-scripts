@@ -26,7 +26,7 @@ YOUR LOG FILES ARE LOCATED IN Documents/KPD/banlog.txt.
 
 A new user will be greeted like this.
 
-![image](https://user-images.githubusercontent.com/79867635/111846589-6f4c9b80-8907-11eb-893a-debcec3a13d9.png)
+![image](https://user-images.githubusercontent.com/79867635/111849816-d3269280-890e-11eb-99fc-aece93006e0d.png)
 
 
 Set your preferences and reload the window (F5 or F6).
