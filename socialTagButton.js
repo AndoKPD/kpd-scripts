@@ -157,7 +157,7 @@ module.exports = {
 			}
 			let span = document.createElement('span');
 			span.id = 'tagBtn';
-			span.innerHTML = 'tag';
+			span.innerHTML = 'gavel';
 			span.className = 'material-icons';
 			span.onmouseover = function() { SOUND.play('tick_0',0.1) }
 			span.onclick = function() { reportProfile(); }
