@@ -23,7 +23,6 @@ Launch the Client.
 Almost everything is customizable, open the idkr settings tab and modify settings in the KPD Tab.
 
 YOUR LOG FILES ARE LOCATED IN Documents/KPD/banlog.txt.
-Detailed log is designed to save the time when the tag was executed if you want to keep the video file on pc and not upload it.
 
 A new user will be greeted like this.
 
@@ -64,6 +63,8 @@ Show Additional Call Info: Shows suspect and caller names in a call. After confi
 Show Open Link Button: Adds a 'Link' input element and a 'Open Link' button. Enter a players profile name and click 'Open Link' to quickly access it. If you have a profile link in your clipboard, it opens that instead.
 
 ![image](https://user-images.githubusercontent.com/79867635/111846617-7ecbe480-8907-11eb-8ae4-aff6941f5e5b.png)
+
+Detailed Logs: It is designed to save the time (UTC) when the tag was executed, if you want to keep the video file on pc and not upload it.
 
 
 Hotkeys:
