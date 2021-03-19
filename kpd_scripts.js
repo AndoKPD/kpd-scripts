@@ -1,161 +1,26 @@
-/*Constants*/
-const fs = require('fs');
-const path = 'C:\\Users\\example\\Desktop\\banlog.txt'; //path to your desktop on windows, replace "example" *optional*
-const { clipboard } = require('electron');
+/*---------------------------------------------------------------------------Edit these---------------------------------------------------------------------------*/
+
+const path = 'C:\\Users\\example\\Desktop\\banlog.txt'; //path to your desktop on windows, replace "example"
 const minLVL = 75; //configure to your liking
-const highlightColor = 'red'; //configure to your liking
+const highlightColor = '#63de26'; //configure to your liking
+
+/*---------------------------------------------------------------------------Constants---------------------------------------------------------------------------*/
+const fs = require('fs');
+const { clipboard } = require('electron');
 const profName = sessionStorage.getItem('suspect');
 const profLVL = sessionStorage.getItem('suspectLVL');
 const caller = sessionStorage.getItem('caller');
 
-/*Global Variables*/
+
+/*---------------------------------------------------------------------------Global Variables---------------------------------------------------------------------------*/
 
 let activeTab;
 let nametagState = true;
 let senior;
 let cssApplied = false;
 
-/*Mutation Observers*/
+/*---------------------------------------------------------------------------Chat message Generation---------------------------------------------------------------------------*/
 
-const popupObserver = new MutationObserver(() => {
-	if(document.getElementById('confPop').childNodes[0].innerHTML.includes('Are you sure you want to take action on') && document.getElementsByClassName('takeActionBtn tag').length == 1) {
-		document.getElementById('confPop').childNodes[0].style.textAlign = 'center';
-		let pnshBtn1 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(1));
-		let pnshBtn2 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(2));
-		pnshBtn1.style.backgroundColor = '#414a6d';
-		pnshBtn2.style.backgroundColor = '#ed4242';
-	}  
-});
-
-const kpdObserver = new MutationObserver(() => {
-	console.log('mutation observed');
-    let kpdHolder = document.getElementById('policePopC');
-	activeTab = determineActiveTab(kpdHolder); 
-	console.log('tab: ' + activeTab);
-	if (activeTab != 0 && document.getElementById('kpdCalls').length != 0) { 
-		if(activeTab == 1) { 
-			console.log('highlight');
-			highlight(); 
-			joinButtonHook();
-			if(!document.getElementById('kpdSearch')) { 
-				let node = genSearchBar(activeTab);
-				addSearchBar(node); 
-			}
-		} else if(activeTab == 2) {
-			if(!document.getElementById('kpdSearch')) {
-				let node = genSearchBar(activeTab);
-				addSearchBar(node);
-			}
-			copyInit();
-		} else {
-			if(!document.getElementById('kpdSearch')) {
-				let node = genSearchBar(activeTab);
-				addSearchBar(node);
-			}
-		}
-	}
-});
-
-const specObserver = new MutationObserver(() => {
-	if(window.focusInterval != undefined && window.focusInterval != 'undefined'){
-		window.clearInterval(window.focusInterval);
-		console.log('focusInterval cleared');
-	}
-	console.log('spec mutation observed');
-	let divs0 = document.getElementsByClassName('specPlayerHolder0');
-	let divs1 = document.getElementsByClassName('specPlayerHolder1');
-	if(divs0.length != 0) {
-		console.log('divs0');
-		specHighlighter(divs0);
-	}
-	if(divs1.length != 0) {
-		console.log('divs1');
-		specHighlighter(divs1);
-	}
-});
-
-const callInfoObserver = new MutationObserver(() => {
-	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
-		if(profName != null && profLVL != null && caller != null) {
-			if(senior) {
-				if(profLVL < 15) {
-					const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
-					writeToFile(text);
-					remSessStorage();
-					openKPDMenu();
-				} else {
-					remSessStorage();
-					openURL('/social.html?p=profile&q='+profName);
-				}
-			} else {
-				remSessStorage();
-				openURL('/social.html?p=profile&q='+profName);
-			}
-		}
-	}else if(document.getElementById('specKPDTxt').innerHTML == 'Case submitted!') {
-		console.log('not cheating');
-		remSessStorage();
-		openKPDMenu();
-	}else if(document.getElementById('specKPDTxt').innerHTML == 'Is ' + profName + ' hacking? Caller: ' + caller) {
-		//if(sessionStorage.getItem('suspect') == null) document.getElementById('specKPDTxt').innerHTML = 'Suspect left the game';
-	}else if(document.getElementById('specKPDTxt').innerHTML.includes('Is Suspect hacking?') || (document.getElementById('specKPDTxt').innerHTML.includes('Is') && document.getElementById('specKPDTxt').innerHTML.includes('hacking?'))) {
-		document.getElementById('specKPDTxt').innerHTML = 'Is ' + profName + ' hacking? Caller: ' + caller;
-	}
-});
-
-/*Element Generation & Appending*/
-
-function genPunishButton(number) {
-	let span = document.createElement('span');
-	if(number == 1) {
-		span.innerHTML = 'Log';
-		span.className = 'takeActionBtn log';
-		span.onclick = function() { logProfile(); };
-	} else {
-		span.innerHTML = 'AIO';
-		span.className = 'takeActionBtn aio';
-		span.onclick = function() { aioPunish(); };
-	}
-	return span;
-}
-
-function genSearchBar() {
-	let input = document.createElement('input');
-	input.id = 'kpdSearch';
-	input.placeholder = 'Search Name';
-	input.onkeyup = function() { searchCalls(); }
-	console.log('generated searchbar');
-	return input;
-}
-
-function addSearchBar(searchBar) {
-	if(document.getElementById('policePopC').childNodes.length != 0) {
-		applyCSS();
-		let elem = document.getElementById('policePopC').insertBefore(searchBar, document.getElementById('policePopC').childNodes[3]);
-		elem.oncontextmenu = function() { elem.value = clipboard.readText(); searchCalls(); };
-		console.log('insert');
-	} else {
-		setTimeout(function() { addSearchBar(searchBar) }, 20);
-	}
-}
-
-function genRegion(attrib) {
-	let span = document.createElement('span');
-	span.className = 'callRegion';
-	span.innerHTML = attrib;
-	console.log('generated region');
-	return span;
-}
-
-
-function addRegion(joinButton) {
-	if(joinButton.parentElement.childNodes[1].className != 'classRegion') {
-		let region = joinButton.getAttribute('onclick').slice(12).split(':')[0];
-		let regionSpan = genRegion(region);
-		joinButton.parentElement.insertBefore(regionSpan, joinButton.parentElement.childNodes[1]);
-		console.log('insert region');
-	}
-}
 
 function genChatMsg(text) {
 	let messageHolder = document.createElement('div');
@@ -175,7 +40,7 @@ function genChatMsg(text) {
 	console.log('generated message');
 }
 
-/*CSS Application*/
+/*---------------------------------------------------------------------------CSS Application---------------------------------------------------------------------------*/
 
 function applyCSS() {
 	if(cssApplied) return;
@@ -220,7 +85,7 @@ function applyCSS() {
 	cssApplied = true;
 }
 
-/*Custom Functions*/
+/*---------------------------------------------------------------------------File IO---------------------------------------------------------------------------*/
 
 function writeToFile(text) {
 	fs.appendFile(path, text, (err) => {
@@ -229,6 +94,39 @@ function writeToFile(text) {
 		}
 		console.log("Tag logged.");
 	});
+}
+
+
+
+/*---------------------------------------------------------------------------FEATURES---------------------------------------------------------------------------*/
+
+
+
+
+/*---------------------------------------------------------------------------Alt Menu Buttons---------------------------------------------------------------------------*/
+
+const popupObserver = new MutationObserver(() => {
+	if(document.getElementById('confPop').childNodes[0].innerHTML.includes('Are you sure you want to take action on') && document.getElementsByClassName('takeActionBtn tag').length == 1) {
+		document.getElementById('confPop').childNodes[0].style.textAlign = 'center';
+		let pnshBtn1 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(1));
+		let pnshBtn2 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(2));
+		pnshBtn1.style.backgroundColor = '#414a6d';
+		pnshBtn2.style.backgroundColor = '#ed4242';
+	}  
+});
+
+function genPunishButton(number) {
+	let span = document.createElement('span');
+	if(number == 1) {
+		span.innerHTML = 'Log';
+		span.className = 'takeActionBtn log';
+		span.onclick = function() { logProfile(); };
+	} else {
+		span.innerHTML = 'AIO';
+		span.className = 'takeActionBtn aio';
+		span.onclick = function() { aioPunish(); };
+	}
+	return span;
 }
 
 function getAltMenuLogText() {
@@ -251,6 +149,38 @@ function aioPunish() {
 	writeToFile(text);
 	document.getElementsByClassName('takeActionBtn aoi')[0].style.backgroundColor = 'green';
 }
+
+
+/*---------------------------------------------------------------------------KPD Menu QOL---------------------------------------------------------------------------*/
+
+const kpdObserver = new MutationObserver(() => {
+	console.log('mutation observed');
+    let kpdHolder = document.getElementById('policePopC');
+	activeTab = determineActiveTab(kpdHolder); 
+	console.log('tab: ' + activeTab);
+	if (activeTab != 0 && document.getElementById('kpdCalls').length != 0) { 
+		if(activeTab == 1) { 
+			console.log('highlight');
+			highlight(); 
+			joinButtonHook();
+			if(!document.getElementById('kpdSearch')) { 
+				let node = genSearchBar(activeTab);
+				addSearchBar(node); 
+			}
+		} else if(activeTab == 2) {
+			if(!document.getElementById('kpdSearch')) {
+				let node = genSearchBar(activeTab);
+				addSearchBar(node);
+			}
+			copyInit();
+		} else {
+			if(!document.getElementById('kpdSearch')) {
+				let node = genSearchBar(activeTab);
+				addSearchBar(node);
+			}
+		}
+	}
+});
 
 function determineActiveTab(kpdHolder) {
 	console.log('determineActiveTab');
@@ -339,6 +269,65 @@ function joinButtonHook() {
 	}	
 }
 
+function genSearchBar() {
+	let input = document.createElement('input');
+	input.id = 'kpdSearch';
+	input.placeholder = 'Search Name';
+	input.onkeyup = function() { searchCalls(); }
+	console.log('generated searchbar');
+	return input;
+}
+
+function addSearchBar(searchBar) {
+	if(document.getElementById('policePopC').childNodes.length != 0) {
+		applyCSS();
+		let elem = document.getElementById('policePopC').insertBefore(searchBar, document.getElementById('policePopC').childNodes[3]);
+		elem.oncontextmenu = function() { elem.value = clipboard.readText(); searchCalls(); };
+		console.log('insert');
+	} else {
+		setTimeout(function() { addSearchBar(searchBar) }, 20);
+	}
+}
+
+function genRegion(attrib) {
+	let span = document.createElement('span');
+	span.className = 'callRegion';
+	span.innerHTML = attrib;
+	console.log('generated region');
+	return span;
+}
+
+
+function addRegion(joinButton) {
+	if(joinButton.parentElement.childNodes[1].className != 'classRegion') {
+		let region = joinButton.getAttribute('onclick').slice(12).split(':')[0];
+		let regionSpan = genRegion(region);
+		joinButton.parentElement.insertBefore(regionSpan, joinButton.parentElement.childNodes[1]);
+		console.log('insert region');
+	}
+}
+
+function copyInit(){
+	if(document.getElementById('kpdCalls').childNodes[0].childNodes.length == 6) { //if data is present
+		let divs = document.getElementById('kpdCalls').childNodes;
+		for(let i = 0; i < divs.length; i++){
+			divs[i].childNodes[0].oncontextmenu = function() { execCopy(divs[i].childNodes[0])	}
+			divs[i].childNodes[4].oncontextmenu = function() { execCopy(divs[i].childNodes[4])	}
+		}
+	}else {
+		setTimeout(copyInit, 20); //try again
+	}	
+}
+
+function execCopy(elem) {
+	let name = elem.innerHTML;
+	clipboard.writeText(name);
+	elem.innerHTML = 'Copied'
+	setTimeout(function() { elem.innerHTML = name }, 800);
+}
+
+/*---------------------------------------------------------------------------Hide Nametag Hotkey---------------------------------------------------------------------------*/
+
 function toggleNames() {
 	if(nametagState) {
 		setSetting("hideNames", 0);
@@ -353,23 +342,26 @@ function toggleNames() {
 	}
 }
 
-function toggleFocus() {
-	if(localStorage.getItem('suspectFocus') == null) {
-		localStorage.setItem('suspectFocus', 'on');
-		genChatMsg('Suspect focus is on');
-        console.log('on');
-        focusState = false;
-	} else {
-		localStorage.removeItem('suspectFocus');
-		if(window.focusInterval != undefined && window.focusInterval != 'undefined'){
-			window.clearInterval(window.focusInterval);
-			console.log('focusInterval cleared');
-		}	
-		genChatMsg('Suspect focus is off');
-        console.log('off');
-        focusState = true;
+
+/*---------------------------------------------------------------------------Spectate QOL---------------------------------------------------------------------------*/
+
+const specObserver = new MutationObserver(() => {
+	if(window.focusInterval != undefined && window.focusInterval != 'undefined'){
+		window.clearInterval(window.focusInterval);
+		console.log('focusInterval cleared');
 	}
-}
+	console.log('spec mutation observed');
+	let divs0 = document.getElementsByClassName('specPlayerHolder0');
+	let divs1 = document.getElementsByClassName('specPlayerHolder1');
+	if(divs0.length != 0) {
+		console.log('divs0');
+		specHighlighter(divs0);
+	}
+	if(divs1.length != 0) {
+		console.log('divs1');
+		specHighlighter(divs1);
+	}
+});
 
 function specHighlighter(divs) {
 	console.log('specHighlight');
@@ -400,6 +392,38 @@ function focusPlayer(number) {
 	pressButton(keycode);
 }
 
+
+/*---------------------------------------------------------------------------Extra call info---------------------------------------------------------------------------*/
+
+const callInfoObserver = new MutationObserver(() => {
+	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
+		if(profName != null && profLVL != null && caller != null) {
+			if(senior) {
+				if(profLVL < 15) {
+					const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
+					writeToFile(text);
+					remSessStorage();
+					openKPDMenu();
+				} else {
+					remSessStorage();
+					openURL('/social.html?p=profile&q='+profName);
+				}
+			} else {
+				remSessStorage();
+				openURL('/social.html?p=profile&q='+profName);
+			}
+		}
+	}else if(document.getElementById('specKPDTxt').innerHTML == 'Case submitted!') {
+		console.log('not cheating');
+		remSessStorage();
+		openKPDMenu();
+	}else if(document.getElementById('specKPDTxt').innerHTML == 'Is ' + profName + ' hacking? Caller: ' + caller) {
+		//if(sessionStorage.getItem('suspect') == null) document.getElementById('specKPDTxt').innerHTML = 'Suspect left the game';
+	}else if(document.getElementById('specKPDTxt').innerHTML.includes('Is Suspect hacking?') || (document.getElementById('specKPDTxt').innerHTML.includes('Is') && document.getElementById('specKPDTxt').innerHTML.includes('hacking?'))) {
+		document.getElementById('specKPDTxt').innerHTML = 'Is ' + profName + ' hacking? Caller: ' + caller;
+	}
+});
+
 function remSessStorage() {
 	if(window.focusInterval != undefined && window.focusInterval != 'undefined'){
 		window.clearInterval(window.focusInterval);
@@ -411,31 +435,36 @@ function remSessStorage() {
 	sessionStorage.removeItem('initSpec');
 }
 
-function copyInit(){
-	if(document.getElementById('kpdCalls').childNodes[0].childNodes.length == 6) { //if data is present
-		let divs = document.getElementById('kpdCalls').childNodes;
-		for(let i = 0; i < divs.length; i++){
-			divs[i].childNodes[0].oncontextmenu = function() { execCopy(divs[i].childNodes[0])	}
-			divs[i].childNodes[4].oncontextmenu = function() { execCopy(divs[i].childNodes[4])	}
-		}
-	}else {
-		setTimeout(copyInit, 20); //try again
-	}	
+
+
+/*---------------------------------------------------------------------------Suspect Focus---------------------------------------------------------------------------*/
+
+function toggleFocus() {
+	if(localStorage.getItem('suspectFocus') == null) {
+		localStorage.setItem('suspectFocus', 'on');
+		genChatMsg('Suspect focus is on');
+        console.log('on');
+        focusState = false;
+	} else {
+		localStorage.removeItem('suspectFocus');
+		if(window.focusInterval != undefined && window.focusInterval != 'undefined'){
+			window.clearInterval(window.focusInterval);
+			console.log('focusInterval cleared');
+		}	
+		genChatMsg('Suspect focus is off');
+        console.log('off');
+        focusState = true;
+	}
 }
 
-function execCopy(elem) {
-	let name = elem.innerHTML;
-	clipboard.writeText(name);
-	elem.innerHTML = 'Copied'
-	setTimeout(function() { elem.innerHTML = name }, 800);
-}
+/*---------------------------------------------------------------------------Open KPD---------------------------------------------------------------------------*/
 
 function openKPDMenu() {
 	document.exitPointerLock();
 	setTimeout( function() { shoPolicePop(); }, 200);
 }
 
-/*Modules*/
+/*---------------------------------------------------------------------------Modules---------------------------------------------------------------------------*/
 
 module.exports = {
     name: 'KPD Scripts',
@@ -444,9 +473,9 @@ module.exports = {
     description: 'Collection of QOL Changes for KPD Officers',
     locations: ['game'],
     settings: {
-        altLog: {
-            name: 'Alt Menu Logger',   
-            id: 'altLog',
+        altButtons: {
+            name: 'Add extra Alt Menu Buttons',   
+            id: 'altButtons',
             cat: 'KPD',
             type: 'checkbox',
 			val: true,
@@ -461,7 +490,7 @@ module.exports = {
             }
         },
         kpdMenuQOL: {
-			name: 'KPD QOL',
+			name: 'KPD Menu QOL',
 			id: 'kpdMenuQOL',
 			cat: 'KPD',
 			type: 'checkbox',
@@ -475,7 +504,7 @@ module.exports = {
             }
         },
         nametagHider: {
-            name: "Nametag Hider",
+            name: 'Hide Nametag Hotkey',
             id: "nametagHider",
             cat: "KPD",
             type: 'text',
@@ -508,9 +537,9 @@ module.exports = {
 				specObserver.disconnect();
             }
         },
-        suspectDisplay: {
-            name: 'Suspect Display',
-            id: 'suspectDisplay',
+        extraCallInfo: {
+            name: 'Show additional call information',
+            id: 'extraCallInfo',
             cat: 'KPD',
             type: 'checkbox',
 			val: true,
@@ -525,7 +554,7 @@ module.exports = {
             }
         },
         suspectFocus: {
-            name: "Suspect Focus",
+            name: "Suspect Focus Hotkey",
             id: "suspectFocus",
             cat: "KPD",
             type: 'text',
@@ -547,7 +576,7 @@ module.exports = {
             }
 		},
 		openKPD: {
-		name: "Open KPD",
+		name: "I Key opens KPD Menu",
             id: "openKPD",
             cat: "KPD",
             type: 'checkbox',
