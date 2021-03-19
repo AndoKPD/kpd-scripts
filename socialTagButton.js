@@ -1,10 +1,45 @@
-const { clipboard } = require('electron');
-const path = 'C:\\Users\\example\\Desktop\\banlog.txt'; //path to your desktop on windows, replace "example" *optional*
+/*---------------------------------------------------------------------------By ando#6372---------------------------------------------------------------------------*/
+
+/*---------------------------------------------------------------------------Constants---------------------------------------------------------------------------*/
+
 const fs = require('fs');
+const os = require('os');
+const { clipboard } = require('electron');
+const logPath = os.homedir() + '\\Documents\\KPD\\banlog.txt';
+const detailedPath = os.homedir() + '\\Documents\\KPD\\detailed_log.txt';
+
+/*---------------------------------------------------------------------------Variables---------------------------------------------------------------------------*/
+
 let playerName;
 
+/*---------------------------------------------------------------------------File IO---------------------------------------------------------------------------*/
 
-function pasteEvidence() { //waits until report text area is loaded, gets evidence from clipboard, pastes it and sends the report
+function dirCheck() {
+	if (!fs.existsSync(os.homedir() + '\\Documents\\KPD')){
+		fs.mkdirSync(os.homedir() + '\\Documents\\KPD');
+	}
+}
+
+function writeToFile(path, text) {
+	fs.appendFile(path, text, (err) => {
+		if (err) {
+			throw err;
+		}
+		console.log('Tag logged.');
+	});
+}
+
+function logProfile(text) {
+	let printText = '\n\nhttps://krunker.io/social.html?p=profile&q=' + playerName + '\n' + text;
+	dirCheck();
+	writeToFile(logPath, printText);
+	let d = new Date();
+	writeToFile(detailedPath, printText + '\n' + d.toUTCString());
+}
+
+/*---------------------------------------------------------------------------FEATURES---------------------------------------------------------------------------*/
+
+function pasteEvidence() {
 	if(!!document.getElementById("reportTxt")) {
 		let clipContent = clipboard.readText();
 		if(clipContent != null && clipContent != '' && !(clipContent.includes('https://krunker.io/social.html?p=profile&q='))) {
@@ -17,31 +52,26 @@ function pasteEvidence() { //waits until report text area is loaded, gets eviden
 	}
 }
 
-function tag() { //if the user is not tagged, tag. else do nothing
+function tag() {
 	if(document.getElementById("hackText").style.display == 'none') {
 		flagUser();
 	}
 }
 
-
-function logTag(evidence) { //log player link and evidence to text file
-	const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + playerName + '\n' + evidence;
-	fs.appendFile(path, text, (err) => {
-		if (err) {
-			throw err;
-		}
-		console.log("Tag logged.");
-	});
-}
-
-function reportProfile() { //opens the report window, pastes evidence and sends report, tags, logs evidence
+function reportProfile() {
 	reportPopup();
 	let evidence = pasteEvidence();
 	tag();
-	logTag(evidence);
+	logProfile(evidence);
+	document.head.appendChild(Object.assign(document.createElement('style'), {
+		innerText: `#tagBtn {
+						color: green !important;
+					}`
+		}));
 }
 
-function openAllReports() { //opens every report on report page for faster viewing
+
+function openAllReports() {
 	openProfileTab('reports');
 	let divs = document.getElementsByClassName('reportHolder');
 	for(let i = 0; i < divs.length; i++) {
@@ -70,9 +100,9 @@ function spanAppender (spanElem) {
 	}
 }
 
+/*---------------------------------------------------------------------------CSS Application---------------------------------------------------------------------------*/
 
-
-function applyCSS() { //puts the needed styling in the css
+function applyCSS() {
 	document.head.appendChild(Object.assign(document.createElement('style'), {
 			innerText: `#tagBtn {
 							color: black;
@@ -94,15 +124,18 @@ function applyCSS() { //puts the needed styling in the css
 							border-color: var(--red);
 						}
 						.reportText > a[href^="https://krunker.io/"] {
-							color: white;
+							color: rgba(0,0,0,.5);
 						}
 						.reportText > a {
 							color: red;
+						}
+						.reportFrom, .reportText {
+							user-select: text;
 						}`
 	}))
 }
 
-
+/*---------------------------------------------------------------------------Module---------------------------------------------------------------------------*/
 
 
 module.exports = {
@@ -111,10 +144,10 @@ module.exports = {
 	version: '1.0.0',
 	locations: ['social'],
 	run: () => {
-		document.addEventListener('DOMContentLoaded', () => { //waits until page is loaded, then starts execution
-			let profUrl = window.location.href; //gets current link
-			if(profUrl.includes('https://krunker.io/social.html?p=profile&q=')) { //checks if link is a players profile
-				if(profUrl.includes('&autoTrade')) { //figures out players name
+		document.addEventListener('DOMContentLoaded', () => { 
+			let profUrl = window.location.href;
+			if(profUrl.includes('https://krunker.io/social.html?p=profile&q=')) {
+				if(profUrl.includes('&autoTrade')) {
 					playerName = profUrl.slice(43,-10);
 				} else if(profUrl.includes('&autoReport')) {
 					playerName = profUrl.slice(43,-11);
@@ -122,12 +155,13 @@ module.exports = {
 					playerName = profUrl.slice(43);
 				}
 			}
-			let span = document.createElement('span'); //creates new span element and labels it
+			let span = document.createElement('span');
 			span.id = 'tagBtn';
 			span.innerHTML = 'tag';
 			span.className = 'material-icons';
 			span.onmouseover = function() { SOUND.play('tick_0',0.1) }
 			span.onclick = function() { reportProfile(); }
+			
 			
 			let div = document.createElement('div');
 			div.id = 'openRptBtn';
@@ -135,9 +169,9 @@ module.exports = {
 			div.className = 'bottomBtn';
 			div.onmouseover = function() { SOUND.play('tick_0',0.1) }
 			div.onclick = function() { openAllReports(); }
-			applyCSS(); //adds the css
-			spanAppender(span); //adds the element to the page
+			applyCSS();
+			spanAppender(span);
 			divAppender(div);
-		})
+		});
 	}
 }
