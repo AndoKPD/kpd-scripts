@@ -575,7 +575,7 @@ module.exports = {
 		linkOpener: {
 			name: 'Show Open Link button',
 			id: 'linkOpener',
-			cat: 'Menu',
+			cat: 'KPD',
 			type: 'checkbox',
 			val: true,
 			html: function () { return window.clientUtil.genCSettingsHTML(this) },
