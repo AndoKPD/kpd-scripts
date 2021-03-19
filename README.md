@@ -41,6 +41,9 @@ KPD Menu Features: Adds a Searchbar to call list and ban logs. Supports pasting 
 
 ![image](https://user-images.githubusercontent.com/79867635/111846975-3103ac00-8908-11eb-9494-f1d459251a22.png)
 
+![image](https://user-images.githubusercontent.com/79867635/111848502-75447b80-890b-11eb-9a93-625cee6ae135.png)
+
+
 
 Spectate Features: Highlights both caller and suspect in the spectate ui. Follows the suspect in kpd mode if enabled.
 
