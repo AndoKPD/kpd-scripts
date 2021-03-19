@@ -111,7 +111,7 @@ function logProfile(text) {
 	dirCheck();
 	writeToFile(logPath, text);
 	let d = new Date();
-	writeToFile(detailedPath, text + '\n' + d.toUTCString())
+	writeToFile(detailedPath, text + '\n' + d.toUTCString());
 }
 
 /*---------------------------------------------------------------------------FEATURES---------------------------------------------------------------------------*/
@@ -431,6 +431,25 @@ function remSessStorage() {
 	sessionStorage.removeItem('initSpec');
 }
 
+/*---------------------------------------------------------------------------Link Opener---------------------------------------------------------------------------*/
+
+function openProfLink (profName) {
+	window.open('https://krunker.io/social.html?p=profile&q=' + profName)
+}
+
+function openLink () {
+	let clipContent = clipboard.readText();
+	let profLink = document.getElementById("linkInput").value;
+	if(clipContent.includes('https://krunker.io/social.html?p=profile&q=') && profLink.length == 0) openProfLink(clipContent.slice(43));
+	else {
+		if (profLink != '') {
+		  if(profLink.length > 43) openProfLink(profLink.slice(43));
+		  else openProfLink(profLink);
+		}
+	}
+	document.getElementById("linkInput").value = '';
+}
+
 /*---------------------------------------------------------------------------Open KPD---------------------------------------------------------------------------*/
 
 function openKPDMenu() {
@@ -553,6 +572,24 @@ module.exports = {
                 callInfoObserver.disconnect()
             }
         },
+		linkOpener: {
+			name: 'Show Open Link button',
+			id: 'linkOpener',
+			cat: 'Menu',
+			type: 'checkbox',
+			val: true,
+			html: function () { return window.clientUtil.genCSettingsHTML(this) },
+			set: value => {
+				let linkOpener = document.getElementById('linkOpener')
+				let linkInput = document.getElementById('linkInput')
+				if (linkOpener) { 
+					linkOpener.style.display = value ? '' : 'none' 
+					linkInput.style.display = value ? '' : 'none' 
+					linkOpener.onmouseover = function() { playTick(); }
+					linkOpener.onclick = function() { openLink(); }
+				}
+			}
+		},
         suspectFocus: {
             name: 'Suspect Focus Hotkey',
             id: 'suspectFocus',
@@ -638,7 +675,19 @@ module.exports = {
 			}
         }
 	},
-	"run": config => {
-		applyCSS();
+	run: () => {
+		window.addEventListener('DOMContentLoaded', (event) => {
+			applyCSS();
+			let div = document.createElement('div');
+			div.id = 'linkOpener';
+			div.innerHTML = 'Open Link';
+			div.className = 'button';
+			let input = document.createElement('input');
+			input.id = 'linkInput';
+			input.placeholder = 'Link';
+			input.className = 'formInput';
+			document.getElementById('menuClassContainer').appendChild(div);
+			document.getElementById('menuClassContainer').appendChild(input);
+		});
 	}
 }
