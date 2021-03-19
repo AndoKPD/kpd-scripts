@@ -15,6 +15,10 @@ Put update mode on skip if you don't want auto updates.
 How to use:
 Install idkr client, then enable userscripts in the idkr settings tab. Close the client.
 To install the userscipts, download the code as zip, then drag both .js files to Documents/idkr/scripts
+
+![image](https://user-images.githubusercontent.com/79867635/111847725-b3d93680-8909-11eb-8431-d01b425e9a26.png)
+
+
 Launch the Client.
 Almost everything is customizable, open the idkr settings tab and modify settings in the KPD Tab.
 A new user will be greeted like this.
