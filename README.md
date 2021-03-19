@@ -29,10 +29,15 @@ other idkr keyboard shortcuts are found here: https://github.com/Mixaz017/idkr#k
 UNDERSTANDING THE SETTINGS:
 
 Senior: Set if you are Senior or not (Defaults to off).
+
 KPD Menu Features: Adds a Searchbar to call list and ban logs. Supports pasting clipboard on right click. Highlights players based on your settings. Copies names out of Ban Logs via right click. Shows call region in call list.
+
 Spectate Features: Highlights both caller and suspect in the spectate ui. Follows the suspect in kpd mode if enabled.
+
 Alt Menu Buttons: Adds two buttons to the alt menu, 'Log' saves the suspects link to your logfile, 'AOI' flags, bans and logs the player without confirmation (Be careful).
+
 Show Additional Call Info: Shows suspect and caller names in a call. After confirming it opens players profile based on your preferences. If you deny, it opens the KPD menu.
+
 Show Open Link Button: Adds a 'Link' input element and a 'Open Link' button. Enter a players profile name and click 'Open Link' to quickly access it. If you have a profile link in your clipboard, it opens that instead.
 
 ![image](https://user-images.githubusercontent.com/79867635/111846617-7ecbe480-8907-11eb-8ae4-aff6941f5e5b.png)
