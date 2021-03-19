@@ -21,6 +21,9 @@ To install the userscipts, download the code as zip, then drag both .js files to
 
 Launch the Client.
 Almost everything is customizable, open the idkr settings tab and modify settings in the KPD Tab.
+
+YOUR LOG FILES ARE LOCATED IN Documents/KPD/banlog.txt.
+
 A new user will be greeted like this.
 
 ![image](https://user-images.githubusercontent.com/79867635/111846589-6f4c9b80-8907-11eb-893a-debcec3a13d9.png)
