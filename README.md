@@ -61,6 +61,9 @@ Suspect Focus: Toggle if the suspect is followed in KPD mode.
 
 Hide Nametag: Toggles all nametags.
 
+![image](https://user-images.githubusercontent.com/79867635/111847265-bdae6a00-8908-11eb-84bc-e1d31190dbda.png)
+
+
 KPD Menu: Opens the KPD menu.
 
 Preferences:
@@ -79,6 +82,9 @@ socialTagButton.js:
 	Usage: First, open source code file and change the path to your logs file. After that's done copy evidence into clipboard, press the button. Thats it.
 	Issues: If you don't open a players profile link but instead go on market, hub, etc. first, then click on a profile, the button doesn't appear. It might also disappear after a tag has been executed, but it doesn't really matter.
 	WARNING: No promt to confirm or anything, pressing the button tags. Be careful.
+	
+	![image](https://user-images.githubusercontent.com/79867635/111847588-69f05080-8909-11eb-9080-f5e275fd7cd6.png)
+
 
 
 Enjoy :)
