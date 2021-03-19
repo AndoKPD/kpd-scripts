@@ -77,13 +77,15 @@ Anti Color: Highlights players over level 15 if senior is set.
 Additional Script	
 
 socialTagButton.js:
-
 	Features: Adds a tag button on profiles. If clicked, it tags the user (if tagged it doesn't untag), also reports user with clipboard content and puts profile link and    clipboard content into a text file for logging purpose. Also has a button whcih opens reports section, opens every report and highlights every link.
-	Usage: First, open source code file and change the path to your logs file. After that's done copy evidence into clipboard, press the button. Thats it.
-	Issues: If you don't open a players profile link but instead go on market, hub, etc. first, then click on a profile, the button doesn't appear. It might also disappear after a tag has been executed, but it doesn't really matter.
-	WARNING: No promt to confirm or anything, pressing the button tags. Be careful.
 	
-	![image](https://user-images.githubusercontent.com/79867635/111847588-69f05080-8909-11eb-9080-f5e275fd7cd6.png)
+Usage: Copy evidence into clipboard, press the button. Thats it.
+	
+Issues: If you don't open a players profile link but instead go on market, hub, etc. first, then click on a profile, the button doesn't appear. It might also disappear after a tag has been executed, but it doesn't really matter.
+
+WARNING: No promt to confirm or anything, pressing the button tags. Be careful.
+	
+![image](https://user-images.githubusercontent.com/79867635/111847588-69f05080-8909-11eb-9080-f5e275fd7cd6.png)
 
 
 
