@@ -1,25 +1,31 @@
-/*---------------------------------------------------------------------------Edit these---------------------------------------------------------------------------*/
-
-const path = 'C:\\Users\\example\\Desktop\\banlog.txt'; //path to your desktop on windows, replace "example"
-const minLVL = 75; //configure to your liking
-const highlightColor = '#63de26'; //configure to your liking
+/*---------------------------------------------------------------------------By ando#6372---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------Constants---------------------------------------------------------------------------*/
+
 const fs = require('fs');
+const os = require('os');
 const { clipboard } = require('electron');
+const { config } = require('node:process');
+const logPath = os.homedir() + '\\Documents\\KPD\\banlog.txt';
+const detailedPath = os.homedir() + '\\Documents\\KPD\\detailed_log.txt';
 const profName = sessionStorage.getItem('suspect');
 const profLVL = sessionStorage.getItem('suspectLVL');
 const caller = sessionStorage.getItem('caller');
 
-
 /*---------------------------------------------------------------------------Global Variables---------------------------------------------------------------------------*/
+
+/*User Set*/
+let senior = false;
+let minLVL = 75;
+let highlightColor = '#63de26';
+let antiHighlightColor = '#fc3232';
+
+/*Code Set*/
 
 let activeTab;
 let nametagState = true;
-let senior;
-let cssApplied = false;
 
-/*---------------------------------------------------------------------------Chat message Generation---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------Chat Message Generation---------------------------------------------------------------------------*/
 
 
 function genChatMsg(text) {
@@ -35,17 +41,18 @@ function genChatMsg(text) {
 	chatMsg.innerHTML = text;
 	chatItem.appendChild(chatMsg);
 	messageHolder.appendChild(chatItem);
-	applyCSS();
-	document.getElementById('chatList').appendChild(messageHolder).scrollIntoView({ behavior: "smooth", block: "end" });;
+	document.getElementById('chatList').appendChild(messageHolder).scrollIntoView({ behavior: 'smooth', block: 'end' });;
 	console.log('generated message');
 }
 
 /*---------------------------------------------------------------------------CSS Application---------------------------------------------------------------------------*/
 
 function applyCSS() {
-	if(cssApplied) return;
 	document.head.appendChild(Object.assign(document.createElement('style'), {
-			innerText: `#kpdSearch {
+			innerText: `#settingsTabLayout {
+							grid-template-columns: auto auto auto auto auto auto;
+						}
+						#kpdSearch {
 							background-color: transparent;
 							box-shadow: 0 0 7px 1px var(--accent);
 							padding: 4px;
@@ -81,74 +88,36 @@ function applyCSS() {
 						.specPlayerHolder1 #specKPDCaller {
 							left: 2px;
 						}`
-	}))
-	cssApplied = true;
+	}));
 }
 
 /*---------------------------------------------------------------------------File IO---------------------------------------------------------------------------*/
 
-function writeToFile(text) {
+function dirCheck() {
+	if (!fs.existsSync(os.homedir() + '\\Documents\\KPD')){
+		fs.mkdirSync(os.homedir() + '\\Documents\\KPD');
+	}
+}
+
+function writeToFile(path, text) {
 	fs.appendFile(path, text, (err) => {
 		if (err) {
 			throw err;
 		}
-		console.log("Tag logged.");
+		console.log('Tag logged.');
 	});
 }
 
-
+function logProfile(text) {
+	dirCheck();
+	writeToFile(logPath, text);
+	let d = new Date();
+	writeToFile(detailedPath, text + '\n' + d.toUTCString())
+}
 
 /*---------------------------------------------------------------------------FEATURES---------------------------------------------------------------------------*/
 
 
-
-
-/*---------------------------------------------------------------------------Alt Menu Buttons---------------------------------------------------------------------------*/
-
-const popupObserver = new MutationObserver(() => {
-	if(document.getElementById('confPop').childNodes[0].innerHTML.includes('Are you sure you want to take action on') && document.getElementsByClassName('takeActionBtn tag').length == 1) {
-		document.getElementById('confPop').childNodes[0].style.textAlign = 'center';
-		let pnshBtn1 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(1));
-		let pnshBtn2 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(2));
-		pnshBtn1.style.backgroundColor = '#414a6d';
-		pnshBtn2.style.backgroundColor = '#ed4242';
-	}  
-});
-
-function genPunishButton(number) {
-	let span = document.createElement('span');
-	if(number == 1) {
-		span.innerHTML = 'Log';
-		span.className = 'takeActionBtn log';
-		span.onclick = function() { logProfile(); };
-	} else {
-		span.innerHTML = 'AIO';
-		span.className = 'takeActionBtn aio';
-		span.onclick = function() { aioPunish(); };
-	}
-	return span;
-}
-
-function getAltMenuLogText() {
-	let profLink = 'https://krunker.io/social.html?p=profile&q=';
-	profLink += document.getElementById('confPop').childNodes[0].innerHTML.split(' ').reverse()[0].slice(0, -1);
-	return '\n\n' + profLink;
-}
-
-function logProfile() {
-	const text = getAltMenuLogText();
-	writeToFile(text);
-	document.getElementsByClassName('takeActionBtn log')[0].style.backgroundColor = 'green';
-}
-
-function aioPunish() {
-	let playerID = document.getElementById('confPop').childNodes[1].childNodes[1].getAttribute('onclick').toString().split('"')[1];
-	const text = getAltMenuLogText();
-	flagPlayerConfirmed(playerID);
-	banPlayerConfirmed(playerID);
-	writeToFile(text);
-	document.getElementsByClassName('takeActionBtn aoi')[0].style.backgroundColor = 'green';
-}
 
 
 /*---------------------------------------------------------------------------KPD Menu QOL---------------------------------------------------------------------------*/
@@ -205,20 +174,20 @@ function searchCalls() {
 			if (caller.includes(inputVal) || suspect.includes(inputVal) ||
 			cLevel.includes(inputVal) || sLevel.includes(inputVal) || 
 			timeAgo.includes(inputVal) || region.toLowerCase().includes(inputVal.toLowerCase())) { 
-				divs[i].style.display="block";			
+				divs[i].style.display='block';			
 			} 
 			else { 
-				divs[i].style.display="none";        
+				divs[i].style.display='none';        
 			} 
 		}
 		if(activeTab == 2) {
 			let tagger = divs[i].outerHTML.split('=')[5].split('>')[0].toLowerCase();
 			let hacker = divs[i].outerHTML.split('=')[10].split('>')[0].toLowerCase();
 			if (tagger.includes(inputVal) || hacker.includes(inputVal)) { 
-				divs[i].style.display="block";			
+				divs[i].style.display='block';			
 			} 
 			else { 
-				divs[i].style.display="none";        
+				divs[i].style.display='none';        
 			} 
 		}
     } 
@@ -232,9 +201,9 @@ function highlight() { //highlights calls
 			if(lvl[i].childNodes[1].innerHTML >= minLVL) lvl[i].childNodes[1].style.color = highlightColor; //highlight the number
 			if(senior) {
 				if(lvl[i].childNodes[4].innerHTML < 15) {
-					lvl[i].childNodes[4].style.color = '#63de26';
+					lvl[i].childNodes[4].style.color = highlightColor;
 				} else {
-					lvl[i].childNodes[4].style.color = '#fc3232';
+					lvl[i].childNodes[4].style.color = antiHighlightColor;
 				}
 			}
 		}
@@ -280,7 +249,6 @@ function genSearchBar() {
 
 function addSearchBar(searchBar) {
 	if(document.getElementById('policePopC').childNodes.length != 0) {
-		applyCSS();
 		let elem = document.getElementById('policePopC').insertBefore(searchBar, document.getElementById('policePopC').childNodes[3]);
 		elem.oncontextmenu = function() { elem.value = clipboard.readText(); searchCalls(); };
 		console.log('insert');
@@ -326,22 +294,6 @@ function execCopy(elem) {
 	setTimeout(function() { elem.innerHTML = name }, 800);
 }
 
-/*---------------------------------------------------------------------------Hide Nametag Hotkey---------------------------------------------------------------------------*/
-
-function toggleNames() {
-	if(nametagState) {
-		setSetting("hideNames", 0);
-		genChatMsg('Nametags are on');
-        console.log('on');
-        nametagState = false
-	} else {
-		setSetting("hideNames", 3);
-		genChatMsg('Nametags are off');
-        console.log('off');
-        nametagState = true;
-	}
-}
-
 
 /*---------------------------------------------------------------------------Spectate QOL---------------------------------------------------------------------------*/
 
@@ -373,7 +325,6 @@ function specHighlighter(divs) {
 			divs[i].childNodes[5].innerHTML = 'call';
 			divs[i].childNodes[5].id = 'specKPDCaller';
 			divs[i].childNodes[0].setAttribute('style', 'outline: solid 4px #135DD8;')
-			applyCSS();
 		}else if(divs[i].childNodes[2].innerHTML == sessionStorage.getItem('suspect')) {
 			divs[i].childNodes[2].style.color = '#c00000';
 			divs[i].childNodes[2].style.textShadow = 'none';
@@ -392,6 +343,52 @@ function focusPlayer(number) {
 	pressButton(keycode);
 }
 
+/*---------------------------------------------------------------------------Alt Menu Buttons---------------------------------------------------------------------------*/
+
+const popupObserver = new MutationObserver(() => {
+	if(document.getElementById('confPop').childNodes[0].innerHTML.includes('Are you sure you want to take action on') && document.getElementsByClassName('takeActionBtn tag').length == 1) {
+		document.getElementById('confPop').childNodes[0].style.textAlign = 'center';
+		let pnshBtn1 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(1));
+		let pnshBtn2 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(2));
+		pnshBtn1.style.backgroundColor = '#414a6d';
+		pnshBtn2.style.backgroundColor = '#ed4242';
+	}  
+});
+
+function genPunishButton(number) {
+	let span = document.createElement('span');
+	if(number == 1) {
+		span.innerHTML = 'Log';
+		span.className = 'takeActionBtn log';
+		span.onclick = function() { logPunish(); };
+	} else {
+		span.innerHTML = 'AIO';
+		span.className = 'takeActionBtn aio';
+		span.onclick = function() { aioPunish(); };
+	}
+	return span;
+}
+
+function getAltMenuLogText() {
+	let profLink = 'https://krunker.io/social.html?p=profile&q=';
+	profLink += document.getElementById('confPop').childNodes[0].innerHTML.split(' ').reverse()[0].slice(0, -1);
+	return '\n\n' + profLink;
+}
+
+function logPunish() {
+	const text = getAltMenuLogText();
+	logProfile(text);
+	document.getElementsByClassName('takeActionBtn log')[0].style.backgroundColor = 'green';
+}
+
+function aioPunish() {
+	let playerID = document.getElementById('confPop').childNodes[1].childNodes[1].getAttribute('onclick').toString().split('"')[1];
+	const text = getAltMenuLogText();
+	flagPlayerConfirmed(playerID);
+	banPlayerConfirmed(playerID);
+	logProfile(text);
+	document.getElementsByClassName('takeActionBtn aoi')[0].style.backgroundColor = 'green';
+}
 
 /*---------------------------------------------------------------------------Extra call info---------------------------------------------------------------------------*/
 
@@ -401,7 +398,7 @@ const callInfoObserver = new MutationObserver(() => {
 			if(senior) {
 				if(profLVL < 15) {
 					const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
-					writeToFile(text);
+					logProfile(text);
 					remSessStorage();
 					openKPDMenu();
 				} else {
@@ -435,7 +432,12 @@ function remSessStorage() {
 	sessionStorage.removeItem('initSpec');
 }
 
+/*---------------------------------------------------------------------------Open KPD---------------------------------------------------------------------------*/
 
+function openKPDMenu() {
+	document.exitPointerLock();
+	setTimeout( function() { shoPolicePop(); }, 200);
+}
 
 /*---------------------------------------------------------------------------Suspect Focus---------------------------------------------------------------------------*/
 
@@ -457,11 +459,20 @@ function toggleFocus() {
 	}
 }
 
-/*---------------------------------------------------------------------------Open KPD---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------Hide Nametag Hotkey---------------------------------------------------------------------------*/
 
-function openKPDMenu() {
-	document.exitPointerLock();
-	setTimeout( function() { shoPolicePop(); }, 200);
+function toggleNames() {
+	if(nametagState) {
+		setSetting('hideNames', 0);
+		genChatMsg('Nametags are on');
+        console.log('on');
+        nametagState = false
+	} else {
+		setSetting('hideNames', 3);
+		genChatMsg('Nametags are off');
+        console.log('off');
+        nametagState = true;
+	}
 }
 
 /*---------------------------------------------------------------------------Modules---------------------------------------------------------------------------*/
@@ -473,24 +484,19 @@ module.exports = {
     description: 'Collection of QOL Changes for KPD Officers',
     locations: ['game'],
     settings: {
-        altButtons: {
-            name: 'Add extra Alt Menu Buttons',   
-            id: 'altButtons',
-            cat: 'KPD',
-            type: 'checkbox',
-			val: true,
-            html: function() {
-                return clientUtil.genCSettingsHTML(this)
-            },
+		seniorSet: {
+			name: 'Senior',
+			id: 'senior',
+			cat: 'KPD',
+			type: 'checkbox',
+			val: false,
+            html: function() { return clientUtil.genCSettingsHTML(this) },
             set: value => {
-                if (value){
-                    return popupObserver.observe(confPop, { childList: true });
-                }
-                popupObserver.disconnect()
+                senior = value;
             }
-        },
+		},
         kpdMenuQOL: {
-			name: 'KPD Menu QOL',
+			name: 'KPD Menu Features',
 			id: 'kpdMenuQOL',
 			cat: 'KPD',
 			type: 'checkbox',
@@ -503,33 +509,16 @@ module.exports = {
                 kpdObserver.disconnect()
             }
         },
-        nametagHider: {
-            name: 'Hide Nametag Hotkey',
-            id: "nametagHider",
-            cat: "KPD",
-            type: 'text',
-            val: '',
-            placeholder: 'F2',
-            html: function(){ return clientUtil.genCSettingsHTML(this); },
-        },
         specQOL: {
-            name: 'Spectate QOL',
+            name: 'Spectate Features',
             id: 'specQOL',
             cat: 'KPD',
             type: 'checkbox',
 			val: true,
-            html: function() {
-                return clientUtil.genCSettingsHTML(this)
-            },
+            html: function() { return clientUtil.genCSettingsHTML(this) },
             set: value => {
 				if (value && sessionStorage.getItem('initSpec') == 'true'){
 					console.log('specQOL started');
-					document.addEventListener('DOMContentLoaded', () => {
-						let cnvs = document.getElementById('game-overlay');
-						let att = document.createAttribute("tabindex"); 
-						att.value = "1";
-						cnvs.setAttributeNode(att);
-					})
 					specObserver.observe(specTeam0, { childList: true });
 					specObserver.observe(specTeam1, { childList: true });
 					return;
@@ -537,15 +526,27 @@ module.exports = {
 				specObserver.disconnect();
             }
         },
+		altButtons: {
+            name: 'Alt Menu Buttons',   
+            id: 'altButtons',
+            cat: 'KPD',
+            type: 'checkbox',
+			val: true,
+            html: function() { return clientUtil.genCSettingsHTML(this) },
+            set: value => {
+                if (value){
+                    return popupObserver.observe(confPop, { childList: true });
+                }
+                popupObserver.disconnect()
+            }
+        },
         extraCallInfo: {
-            name: 'Show additional call information',
+            name: 'Show Additional Call Info',
             id: 'extraCallInfo',
             cat: 'KPD',
             type: 'checkbox',
 			val: true,
-            html: function() {
-                return clientUtil.genCSettingsHTML(this)
-            },
+            html: function() { return clientUtil.genCSettingsHTML(this) },
             set: value => {
                 if (value){
                     return callInfoObserver.observe(specKPDTxt, { childList: true });
@@ -554,50 +555,91 @@ module.exports = {
             }
         },
         suspectFocus: {
-            name: "Suspect Focus Hotkey",
-            id: "suspectFocus",
-            cat: "KPD",
+            name: 'Suspect Focus Hotkey',
+            id: 'suspectFocus',
+            cat: 'KPD',
             type: 'text',
             val: '',
-            placeholder: 'F1',
-            html: function(){ return clientUtil.genCSettingsHTML(this); },
-        },
-		seniorSet: {
-			name: 'Senior',
-			id: 'senior',
-			cat: 'KPD',
-			type: 'checkbox',
-			val: false,
-            html: function() {
-                return clientUtil.genCSettingsHTML(this)
-            },
-            set: value => {
-                senior = value;
-            }
-		},
-		openKPD: {
-		name: "I Key opens KPD Menu",
-            id: "openKPD",
-            cat: "KPD",
-            type: 'checkbox',
-            val: true,
-            placeholder: 'F3',
+            placeholder: 'Empty = F1',
             html: function(){ return clientUtil.genCSettingsHTML(this); },
 			set: value => {
-                if(value) {
-						document.addEventListener("keydown", (e) => ((e.key === 'i' || e.key === 'I') && (openKPDMenu())));
+				if (value !== '') {
+					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase() || e.key === 'F1' ) && (toggleFocus())));
 				}
-            }
-		}
-	},
-    "run": config => {
-        let hotkey1 = config.get("nametagHider", true)
-        let hotkey2 = config.get("suspectFocus", true)
-		if (hotkey1 !== "") {
-			document.addEventListener("keydown", (e) => ((e.key === hotkey1) && (toggleNames())));
+			}
+        },
+		nametagHider: {
+            name: 'Hide Nametag Hotkey',
+            id: 'nametagHider',
+            cat: 'KPD',
+            type: 'text',
+            val: '',
+            placeholder: 'Empty = F2',
+            html: function(){ return clientUtil.genCSettingsHTML(this); },
+			set: value => {
+				if (value !== '') {
+					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase() || e.key === 'F2') && (toggleNames())));
+				}
+			}
+        },
+		openKPD: {
+			name: 'KPD Menu Hotkey',
+			id: 'openKPD',
+			cat: 'KPD',
+			type: 'text',
+            val: '',
+            placeholder: 'Empty = F3',
+            html: function(){ return clientUtil.genCSettingsHTML(this); },
+			set: value => {
+				if (value !== '') {
+					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase() || e.key === 'F3' ) && (openKPDMenu())));
+				}
+			}
+		},
+		lvlHighlight: {
+            name: 'Highlighting Minimum Level',
+            id: 'lvlHighlight',
+            cat: 'KPD',
+            type: 'text',
+            val: '',
+            placeholder: 'Empty = 75',
+            html: function(){ return clientUtil.genCSettingsHTML(this); },
+			set: value => {
+				if (value !== '') {
+					minLVL = parseInt(value);
+				}
+			}
+        },
+		colorHighlight: {
+            name: 'Highlighting Color',
+            id: 'colorHighlight',
+            cat: 'KPD',
+            type: 'text',
+            val: '',
+            placeholder: 'Empty = Green',
+            html: function(){ return clientUtil.genCSettingsHTML(this); },
+			set: value => {
+				if (value !== '' && /^#[A-F0-9]+$/.test(value)) {
+					highlightColor = value;
+				}
+			}
+        },
+		antiColorHighlight: {
+            name: 'Anti Highlighting Color',
+            id: 'antiColorHighlight',
+            cat: 'KPD',
+            type: 'text',
+            val: '',
+            placeholder: 'Empty = Red',
+            html: function(){ return clientUtil.genCSettingsHTML(this); },
+			set: value => {
+				if (value !== '' && /^#[A-F0-9]+$/.test(value)) {
+					highlightColor = value;
+				}
+			}
         }
-        if (hotkey2 !== "") {
-			document.addEventListener("keydown", (e) => ((e.key === hotkey2) && (toggleFocus())));
-		}
-    },
+	},
+	"run": config => {
+		applyCSS();
+	}
 }
