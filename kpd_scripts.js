@@ -49,7 +49,7 @@ function genChatMsg(text) {
 function applyCSS() {
 	document.head.appendChild(Object.assign(document.createElement('style'), {
 			innerText: `#settingsTabLayout {
-							grid-template-columns: auto auto auto auto auto auto;
+							grid-template-columns: auto auto auto auto auto auto auto;
 						}
 						#kpdSearch {
 							background-color: transparent;
