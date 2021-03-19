@@ -5,7 +5,6 @@
 const fs = require('fs');
 const os = require('os');
 const { clipboard } = require('electron');
-const { config } = require('node:process');
 const logPath = os.homedir() + '\\Documents\\KPD\\banlog.txt';
 const detailedPath = os.homedir() + '\\Documents\\KPD\\detailed_log.txt';
 const profName = sessionStorage.getItem('suspect');
