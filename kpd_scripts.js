@@ -15,6 +15,7 @@ const caller = sessionStorage.getItem('caller');
 
 /*User Set*/
 let senior = false;
+let detailedLog = false;
 let minLVL = 75;
 let highlightColor = '#63de26';
 let antiHighlightColor = '#fc3232';
@@ -114,8 +115,10 @@ function writeToFile(path, text) {
 function logProfile(text) {
 	dirCheck();
 	writeToFile(logPath, text);
-	let d = new Date();
-	writeToFile(detailedPath, text + '\n' + d.toUTCString());
+	if(detailedLog) {
+		let d = new Date();
+		writeToFile(detailedPath, text + '\n' + d.toUTCString());
+	}
 }
 
 /*---------------------------------------------------------------------------FEATURES---------------------------------------------------------------------------*/
@@ -591,6 +594,17 @@ module.exports = {
 					linkInput.style.display = value ? '' : 'none' 
 				}
 			}
+		},
+		detailedLog: {
+			name: 'Generate Detailed Logfile',
+			id: 'detailedLog',
+			cat: 'KPD',
+			type: 'checkbox',
+			val: false,
+            html: function() { return clientUtil.genCSettingsHTML(this) },
+            set: value => {
+                detailedLog = value;
+            }
 		},
         suspectFocus: {
             name: 'Suspect Focus Hotkey',
