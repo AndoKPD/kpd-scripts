@@ -84,7 +84,7 @@ Anti Color: Highlights players over level 15 if senior is set.
 Additional Script	
 
 socialTagButton.js:
-	Features: Adds a tag button on profiles. If clicked, it tags the user (if tagged it doesn't untag), also reports user with clipboard content and puts profile link and    clipboard content into a text file for logging purpose. Also has a button whcih opens reports section, opens every report and highlights every link.
+	Features: Adds a tag button on profiles. If clicked, it tags the user (if tagged it doesn't untag), also reports user with clipboard content and puts profile link and    clipboard content into a text file for logging purpose. Also has a button which opens reports section, opens every report and highlights every link.
 	
 Usage: Copy evidence into clipboard, press the button. Thats it.
 	
