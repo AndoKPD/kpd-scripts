@@ -589,8 +589,6 @@ module.exports = {
 				if (linkOpener) { 
 					linkOpener.style.display = value ? '' : 'none' 
 					linkInput.style.display = value ? '' : 'none' 
-					linkOpener.onmouseover = function() { playTick(); }
-					linkOpener.onclick = function() { openLink(); }
 				}
 			}
 		},
@@ -692,6 +690,8 @@ module.exports = {
 			div.id = 'linkOpener';
 			div.innerHTML = 'Open Link';
 			div.className = 'button';
+			div.onmouseover = function() { playTick(); }
+			div.onclick = function() { openLink(); }
 			let input = document.createElement('input');
 			input.id = 'linkInput';
 			input.placeholder = 'Link';
