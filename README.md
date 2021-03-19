@@ -23,6 +23,7 @@ Launch the Client.
 Almost everything is customizable, open the idkr settings tab and modify settings in the KPD Tab.
 
 YOUR LOG FILES ARE LOCATED IN Documents/KPD/banlog.txt.
+Detailed log is designed to save the time when the tag was executed if you want to keep the video file on pc and not upload it.
 
 A new user will be greeted like this.
 
