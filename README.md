@@ -39,12 +39,19 @@ Show Open Link Button: Adds a 'Link' input element and a 'Open Link' button. Ent
 
 
 Hotkeys:
+
 Suspect Focus: Toggle if the suspect is followed in KPD mode.
+
 Hide Nametag: Toggles all nametags.
+
 KPD Menu: Opens the KPD menu.
+
 Preferences:
+
 Minimum Level: Highlights players above this level in the call list.
+
 Color: Set the color of the highlight.
+
 Anti Color: Highlights players over level 15 if senior is set.
 	
 Additional Script	
