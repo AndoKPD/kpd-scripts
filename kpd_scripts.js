@@ -13,13 +13,17 @@ const caller = sessionStorage.getItem('caller');
 let activeTab;
 let nametagState = true;
 let senior;
+let cssApplied = false;
 
 /*Mutation Observers*/
 
 const popupObserver = new MutationObserver(() => {
 	if(document.getElementById('confPop').childNodes[0].innerHTML.includes('Are you sure you want to take action on') && document.getElementsByClassName('takeActionBtn tag').length == 1) {
-		let tmp = document.getElementById('confPop').childNodes[1].appendChild(genSpan());
-		tmp.style.backgroundColor = '#414a6d';
+		document.getElementById('confPop').childNodes[0].style.textAlign = 'center';
+		let pnshBtn1 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(1));
+		let pnshBtn2 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(2));
+		pnshBtn1.style.backgroundColor = '#414a6d';
+		pnshBtn2.style.backgroundColor = '#ed4242';
 	}  
 });
 
@@ -101,12 +105,17 @@ const callInfoObserver = new MutationObserver(() => {
 
 /*Element Generation & Appending*/
 
-function genSpan() {
+function genPunishButton(number) {
 	let span = document.createElement('span');
-	span.innerHTML = 'Log';
-	span.className = 'takeActionBtn log';
-	span.styl
-	span.onclick = function() { logProfile(); };
+	if(number == 1) {
+		span.innerHTML = 'Log';
+		span.className = 'takeActionBtn log';
+		span.onclick = function() { logProfile(); };
+	} else {
+		span.innerHTML = 'AIO';
+		span.className = 'takeActionBtn aio';
+		span.onclick = function() { aioPunish(); };
+	}
 	return span;
 }
 
@@ -169,6 +178,7 @@ function genChatMsg(text) {
 /*CSS Application*/
 
 function applyCSS() {
+	if(cssApplied) return;
 	document.head.appendChild(Object.assign(document.createElement('style'), {
 			innerText: `#kpdSearch {
 							background-color: transparent;
@@ -202,8 +212,12 @@ function applyCSS() {
 							position: absolute;
 							top: 1px;
 							left: 12px;
+						}
+						.specPlayerHolder1 #specKPDCaller {
+							left: 2px;
 						}`
 	}))
+	cssApplied = true;
 }
 
 /*Custom Functions*/
@@ -217,12 +231,25 @@ function writeToFile(text) {
 	});
 }
 
-function logProfile() {
+function getAltMenuLogText() {
 	let profLink = 'https://krunker.io/social.html?p=profile&q=';
 	profLink += document.getElementById('confPop').childNodes[0].innerHTML.split(' ').reverse()[0].slice(0, -1);
-	const text = '\n\n' + profLink;
+	return '\n\n' + profLink;
+}
+
+function logProfile() {
+	const text = getAltMenuLogText();
 	writeToFile(text);
 	document.getElementsByClassName('takeActionBtn log')[0].style.backgroundColor = 'green';
+}
+
+function aioPunish() {
+	let playerID = document.getElementById('confPop').childNodes[1].childNodes[1].getAttribute('onclick').toString().split('"')[1];
+	const text = getAltMenuLogText();
+	flagPlayerConfirmed(playerID);
+	banPlayerConfirmed(playerID);
+	writeToFile(text);
+	document.getElementsByClassName('takeActionBtn aoi')[0].style.backgroundColor = 'green';
 }
 
 function determineActiveTab(kpdHolder) {
@@ -353,10 +380,12 @@ function specHighlighter(divs) {
 			divs[i].childNodes[2].style.textShadow = 'none';
 			divs[i].childNodes[5].innerHTML = 'call';
 			divs[i].childNodes[5].id = 'specKPDCaller';
+			divs[i].childNodes[0].setAttribute('style', 'outline: solid 4px #135DD8;')
 			applyCSS();
 		}else if(divs[i].childNodes[2].innerHTML == sessionStorage.getItem('suspect')) {
-			divs[i].childNodes[2].style.color = 'red';
+			divs[i].childNodes[2].style.color = '#c00000';
 			divs[i].childNodes[2].style.textShadow = 'none';
+			divs[i].childNodes[0].setAttribute('style', 'outline: solid 4px #c00000;')
 			if(localStorage.getItem('suspectFocus') != null) {
 				window.focusInterval = setInterval(function() { focusPlayer(divs[i].childNodes[3].innerHTML); }, 1000);	
 			}
