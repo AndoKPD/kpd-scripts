@@ -32,11 +32,23 @@ Senior: Set if you are Senior or not (Defaults to off).
 
 KPD Menu Features: Adds a Searchbar to call list and ban logs. Supports pasting clipboard on right click. Highlights players based on your settings. Copies names out of Ban Logs via right click. Shows call region in call list.
 
+![image](https://user-images.githubusercontent.com/79867635/111846975-3103ac00-8908-11eb-9494-f1d459251a22.png)
+
+
 Spectate Features: Highlights both caller and suspect in the spectate ui. Follows the suspect in kpd mode if enabled.
+
+![image](https://user-images.githubusercontent.com/79867635/111846999-42e54f00-8908-11eb-8759-e3e6db8a72c7.png)
+
 
 Alt Menu Buttons: Adds two buttons to the alt menu, 'Log' saves the suspects link to your logfile, 'AOI' flags, bans and logs the player without confirmation (Be careful).
 
+![image](https://user-images.githubusercontent.com/79867635/111846939-1fba9f80-8908-11eb-8763-729e5ebdb5bf.png)
+
+
 Show Additional Call Info: Shows suspect and caller names in a call. After confirming it opens players profile based on your preferences. If you deny, it opens the KPD menu.
+
+![image](https://user-images.githubusercontent.com/79867635/111847018-4b3d8a00-8908-11eb-89fd-1e0eb4a39bbc.png)
+
 
 Show Open Link Button: Adds a 'Link' input element and a 'Open Link' button. Enter a players profile name and click 'Open Link' to quickly access it. If you have a profile link in your clipboard, it opens that instead.
 
