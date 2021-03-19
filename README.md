@@ -47,7 +47,7 @@ Spectate Features: Highlights both caller and suspect in the spectate ui. Follow
 ![image](https://user-images.githubusercontent.com/79867635/111846999-42e54f00-8908-11eb-8759-e3e6db8a72c7.png)
 
 
-Alt Menu Buttons: Adds two buttons to the alt menu, 'Log' saves the suspects link to your logfile, 'AOI' flags, bans and logs the player without confirmation (Be careful).
+Alt Menu Buttons: Adds two buttons to the alt menu, 'Log' saves the suspects link to your logfile, 'AIO' flags, bans and logs the player without confirmation (Be careful).
 
 ![image](https://user-images.githubusercontent.com/79867635/111846939-1fba9f80-8908-11eb-8763-729e5ebdb5bf.png)
 
