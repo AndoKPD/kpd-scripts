@@ -24,25 +24,29 @@ let antiHighlightColor = '#fc3232';
 /*Code Set*/
 
 let activeTab;
-let nametagState = true;
+let xrayState = true;
 
 /*---------------------------------------------------------------------------Chat Message Generation---------------------------------------------------------------------------*/
 
+function removeElement(element) {
+	setTimeout(function () { element.remove() }, 1500);
+}
 
 function genChatMsg(text) {
 	let messageHolder = document.createElement('div');
-	messageHolder.id = 'chatMsgHolder_toggle';
+	messageHolder.className = 'chatMsgHolder_toggle';
 	let chatItem = document.createElement('div');
 	chatItem.id = 'chatItem_toggle';
 	chatItem.className = 'chatItem';
-	chatItem.style
 	let chatMsg = document.createElement('span');
 	chatMsg.id = 'chatMsg_toggle';
 	chatMsg.className = 'chatMsg';
 	chatMsg.innerHTML = text;
 	chatItem.appendChild(chatMsg);
 	messageHolder.appendChild(chatItem);
-	document.getElementById('chatList').appendChild(messageHolder).scrollIntoView({ behavior: 'smooth', block: 'end' });;
+	let elem = document.getElementById('chatHolder').insertBefore(messageHolder, document.getElementById('chatList'));
+	elem.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    removeElement(elem);
 	console.log('generated message');
 }
 
@@ -50,12 +54,20 @@ function genChatMsg(text) {
 
 function applyCSS() {
 	document.head.appendChild(Object.assign(document.createElement('style'), {
-			innerText: `#settingsTabLayout {
+			innerText: `
+						#linkInput {
+							background: #414a6d!important;
+    						color: white;
+						}
+						#linkOpener {
+							background-color: #414a6d!important;
+							box-shadow: inset 0 -7px 0 0 #252a3d!important;
+						}
+						#settingsTabLayout {
 							grid-template-columns: auto auto auto auto auto auto auto;
 						}
 						#specKPDContr {
-							width: 700px;
-							height: 105px;
+							width: auto;
 						}
 						#kpdSearch {
 							background-color: transparent;
@@ -74,6 +86,10 @@ function applyCSS() {
 						.callRegion {
 							margin-right: 12px;
                         }
+						.chatMsgHolder_toggle {
+							position: relative;
+							left: 3%;
+						}
                         #chatItem_toggle {
 							background-color: rgba(0, 0, 0, 0.4);
 						}
@@ -201,7 +217,7 @@ function searchCalls() {
 } 
 
 function highlight() { //highlights calls
-	if(document.getElementById('kpdCalls').childElementCount != 0 && document.getElementsByClassName('kpdRepLvl').length != 0) { //if data is present
+	if(document.getElementById('kpdCalls').childNodes.length != 0 && document.getElementsByClassName('kpdRepLvl').length != 0) { //if data is present
 		console.log('highlighting');
 		let lvl = document.getElementById('kpdCalls').childNodes;
 		for(let i = 0; i < lvl.length; i++){
@@ -255,7 +271,7 @@ function genSearchBar() {
 }
 
 function addSearchBar(searchBar) {
-	if(document.getElementById('policePopC').childElementCount != 0) {
+	if(document.getElementById('policePopC').childNodes.length != 0) {
 		let elem = document.getElementById('policePopC').insertBefore(searchBar, document.getElementById('policePopC').childNodes[3]);
 		elem.oncontextmenu = function() { elem.value = clipboard.readText(); searchCalls(); };
 		console.log('insert');
@@ -283,7 +299,8 @@ function addRegion(joinButton) {
 }
 
 function copyInit(){
-	if(document.getElementById('kpdCalls').childNodes[0].childElementCount == 6) { //if data is present
+	console.log('copyInit');
+	if(document.getElementById('kpdCalls').childNodes[0].childNodes.length == 6) { //if data is present
 		let divs = document.getElementById('kpdCalls').childNodes;
 		for(let i = 0; i < divs.length; i++){
 			divs[i].childNodes[0].oncontextmenu = function() { execCopy(divs[i].childNodes[0])	}
@@ -295,6 +312,7 @@ function copyInit(){
 }
 
 function execCopy(elem) {
+	console.log('copyExec')
 	let name = elem.innerHTML;
 	clipboard.writeText(name);
 	elem.innerHTML = 'Copied'
@@ -379,7 +397,7 @@ function genPunishButton(number) {
 function getAltMenuLogText() {
 	let profLink = 'https://krunker.io/social.html?p=profile&q=';
 	profLink += document.getElementById('confPop').childNodes[0].innerHTML.split(' ').reverse()[0].slice(0, -1);
-	return '\n\n' + profLink;
+	return profLink + '\n';
 }
 
 function logPunish() {
@@ -404,7 +422,7 @@ const callInfoObserver = new MutationObserver(() => {
 		if(profName != null && profLVL != null && caller != null) {
 			if(senior) {
 				if(profLVL < 15) {
-					const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
+					const text = 'https://krunker.io/social.html?p=profile&q=' + profName + '\n';
 					logProfile(text);
 					remSessStorage();
 					if(autoOpenMenu) openKPDMenu();
@@ -487,17 +505,17 @@ function toggleFocus() {
 
 /*---------------------------------------------------------------------------Hide Nametag Hotkey---------------------------------------------------------------------------*/
 
-function toggleNames() {
-	if(nametagState) {
+function toggleXray() {
+	if(xrayState) {
 		setSetting('hideNames', 0);
-		genChatMsg('Nametags are on');
+		genChatMsg('X-Ray is on');
         console.log('on');
-        nametagState = false
+        xrayState = false
 	} else {
 		setSetting('hideNames', 3);
-		genChatMsg('Nametags are off');
+		genChatMsg('X-Ray is off');
         console.log('off');
-        nametagState = true;
+        xrayState = true;
 	}
 }
 
@@ -608,7 +626,7 @@ module.exports = {
             }
 		},
 		autoOpenMenu: {
-			name: 'Automatically open KPD Menu after Call',
+			name: 'Open KPD Menu after Call',
 			id: 'autoOpenMenu',
 			cat: 'KPD',
 			type: 'checkbox',
@@ -619,7 +637,7 @@ module.exports = {
             }
 		},
         suspectFocus: {
-            name: 'Suspect Focus Hotkey',
+            name: 'Suspect Focus Toggle',
             id: 'suspectFocus',
             cat: 'KPD',
             type: 'text',
@@ -634,9 +652,9 @@ module.exports = {
 				}
 			}
         },
-		nametagHider: {
-            name: 'Hide Nametag Hotkey',
-            id: 'nametagHider',
+		xrayToggle: {
+            name: 'X-Ray Toggle',
+            id: 'xrayToggle',
             cat: 'KPD',
             type: 'text',
             val: '',
@@ -644,9 +662,9 @@ module.exports = {
             html: function(){ return clientUtil.genCSettingsHTML(this); },
 			set: value => {
 				if (value === '') {
-					document.addEventListener('keydown', (e) => ((e.key === 'F1' ) && (toggleNames())));
+					document.addEventListener('keydown', (e) => ((e.key === 'F2' ) && (toggleXray())));
 				} else {
-					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase()) && (toggleNames())));
+					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase()) && (toggleXray())));
 				}
 			}
         },
@@ -660,7 +678,7 @@ module.exports = {
             html: function(){ return clientUtil.genCSettingsHTML(this); },
 			set: value => {
 				if (value === '') {
-					document.addEventListener('keydown', (e) => ((e.key === 'F1' ) && (openKPDMenu())));
+					document.addEventListener('keydown', (e) => ((e.key === 'F3' ) && (openKPDMenu())));
 				} else {
 					document.addEventListener('keydown', (e) => ((e.key === value || e.key === value.toLowerCase()) && (openKPDMenu())));
 				}
@@ -722,8 +740,10 @@ module.exports = {
 			input.id = 'linkInput';
 			input.placeholder = 'Link';
 			input.className = 'formInput';
-			document.getElementById('menuClassContainer').appendChild(div);
-			document.getElementById('menuClassContainer').appendChild(input);
+			let divElem = document.getElementById('menuClassContainer').appendChild(div);
+			let inputElem = document.getElementById('menuClassContainer').appendChild(input);
+			divElem.oncontextmenu = function() { inputElem.value = clipboard.readText(); openLink(); };
+			inputElem.oncontextmenu = function() { inputElem.value = clipboard.readText(); };
 		});
 	}
 }
