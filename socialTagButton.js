@@ -30,7 +30,7 @@ function writeToFile(path, text) {
 }
 
 function logProfile(text) {
-	let printText = '\n\nhttps://krunker.io/social.html?p=profile&q=' + playerName + '\n' + text;
+	let printText = 'https://krunker.io/social.html?p=profile&q=' + playerName + '\n' + text + '\n';
 	dirCheck();
 	writeToFile(logPath, printText);
 	let d = new Date();
@@ -131,6 +131,11 @@ function applyCSS() {
 						}
 						.reportFrom, .reportText {
 							user-select: text;
+						}
+						#hackText {
+							width: auto;
+							left: 36%;
+							background-color: transparent;
 						}`
 	}))
 }
@@ -165,7 +170,7 @@ module.exports = {
 			
 			let div = document.createElement('div');
 			div.id = 'openRptBtn';
-			div.innerHTML = 'Open All Reports';
+			div.innerHTML = 'All Reports';
 			div.className = 'bottomBtn';
 			div.onmouseover = function() { SOUND.play('tick_0',0.1) }
 			div.onclick = function() { openAllReports(); }
