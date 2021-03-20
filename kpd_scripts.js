@@ -55,6 +55,12 @@ function genChatMsg(text) {
 function applyCSS() {
 	document.head.appendChild(Object.assign(document.createElement('style'), {
 			innerText: `
+						*::-webkit-scrollbar {
+							display: none;
+						}
+						.chatItem {
+							margin-left: 0px
+						}
 						#linkInput {
 							background: #414a6d!important;
     						color: white;
@@ -86,10 +92,6 @@ function applyCSS() {
 						.callRegion {
 							margin-right: 12px;
                         }
-						.chatMsgHolder_toggle {
-							position: relative;
-							left: 3%;
-						}
                         #chatItem_toggle {
 							background-color: rgba(0, 0, 0, 0.4);
 						}
