@@ -424,8 +424,8 @@ function genPunishButton(number) {
 		span.onclick = function() { aioPunish(); };
 		span.onmouseenter = function() { playTick(); };
 	} else if(number == 3) {
-		span.innerHTML = 'Follow';
-		span.className = 'takeActionBtn flw';
+		span.innerHTML = 'Focus';
+		span.className = 'takeActionBtn fcs';
 		span.onclick = function() { followPlayer(); };
 		span.onmouseenter = function() { playTick(); };
 	}
