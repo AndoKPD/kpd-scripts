@@ -7,9 +7,6 @@ const os = require('os');
 const { clipboard } = require('electron');
 const logPath = os.homedir() + '\\Documents\\KPD\\banlog.txt';
 const detailedPath = os.homedir() + '\\Documents\\KPD\\detailed_log.txt';
-const profName = sessionStorage.getItem('suspect');
-const profLVL = sessionStorage.getItem('suspectLVL');
-const caller = sessionStorage.getItem('caller');
 
 /*---------------------------------------------------------------------------Global Variables---------------------------------------------------------------------------*/
 
@@ -23,6 +20,9 @@ let antiHighlightColor = '#fc3232';
 
 /*Code Set*/
 
+let suspect;
+let suspectLVL;
+let caller;
 let activeTab;
 let xrayState = true;
 
@@ -55,7 +55,7 @@ function genChatMsg(text) {
 function applyCSS() {
 	document.head.appendChild(Object.assign(document.createElement('style'), {
 			innerText: `
-						*::-webkit-scrollbar {
+						#chatList::-webkit-scrollbar {
 							display: none;
 						}
 						.chatItem {
@@ -108,8 +108,25 @@ function applyCSS() {
 							top: 1px;
 							left: 12px;
 						}
-						.specPlayerHolder1 #specKPDCaller {
+						#specKPDSuspect {
+							display: inline-block !important; 
+							color: #c00000!important;
+							font-size: 49px!important;
+							vertical-align: middle;
+							text-shadow: -1px -1px 0 #202020, 1px -1px 0 #202020, -1px 1px 0 #202020, 1px 1px 0 #202020;
+							position: absolute;
+							top: 1px;
+							left: 12px;
+						}
+						.specPlayerHolder1 #specKPDCaller, .specPlayerHolder1 #specKPDSuspect {
 							left: 2px;
+						}
+						.customPunishHolder {
+							display: table;
+							table-layout: fixed;
+							width: 100%;
+							border-spacing: 7px;
+							border-collapse: separate;
 						}`
 	}));
 }
@@ -177,10 +194,14 @@ const kpdObserver = new MutationObserver(() => {
 });
 
 function determineActiveTab(kpdHolder) {
-	console.log('determineActiveTab');
-	if(kpdHolder.children[2].children[0].className == 'menuTabNew tabANew') return 1;
-	else if(kpdHolder.children[2].children[1].className == 'menuTabNew tabANew') return 2;
-	return 0;
+	if(document.getElementById('kpdCalls').childNodes.length != 0) { //if data is present
+		console.log('determineActiveTab');
+		if(kpdHolder.children[2].children[0].className == 'menuTabNew tabANew') return 1;
+		else if(kpdHolder.children[2].children[1].className == 'menuTabNew tabANew') return 2;
+		return 0;
+	}else {
+		setTimeout(highlight, 20); //try again
+	}
 }
 
 function searchCalls() { 
@@ -245,7 +266,6 @@ function joinKPD(joinFunc, caller, suspect, suspectLVL) {
 	sessionStorage.setItem('caller', caller);
 	sessionStorage.setItem('suspect', suspect);
 	sessionStorage.setItem('suspectLVL', suspectLVL);
-	sessionStorage.setItem('initSpec', 'true');
 	const f = new Function(joinFunc);
 	f();
 }
@@ -343,19 +363,21 @@ const specObserver = new MutationObserver(() => {
 });
 
 function specHighlighter(divs) {
+	if(suspect == null) return;
 	console.log('specHighlight');
 	for(let i = 0; i < divs.length; i++) {
-		if(divs[i].childNodes[2].innerHTML == sessionStorage.getItem('caller')) {
+		if(divs[i].childNodes[2].innerHTML == caller) {
 			console.log('caller found');
 			divs[i].childNodes[2].style.color = '#135DD8';
 			divs[i].childNodes[2].style.textShadow = 'none';
 			divs[i].childNodes[5].innerHTML = 'call';
 			divs[i].childNodes[5].id = 'specKPDCaller';
 			divs[i].childNodes[0].setAttribute('style', 'outline: solid 4px #135DD8;')
-		}else if(divs[i].childNodes[2].innerHTML == sessionStorage.getItem('suspect')) {
+		}else if(divs[i].childNodes[2].innerHTML == suspect) {
 			divs[i].childNodes[2].style.color = '#c00000';
 			divs[i].childNodes[2].style.textShadow = 'none';
 			divs[i].childNodes[0].setAttribute('style', 'outline: solid 4px #c00000;')
+			if(sessionStorage.getItem('suspect') == null) divs[i].childNodes[5].id = 'specKPDSuspect';
 			if(localStorage.getItem('suspectFocus') != null) {
 				window.focusInterval = setInterval(function() { focusPlayer(divs[i].childNodes[3].innerHTML); }, 1000);	
 			}
@@ -373,12 +395,19 @@ function focusPlayer(number) {
 /*---------------------------------------------------------------------------Alt Menu Buttons---------------------------------------------------------------------------*/
 
 const popupObserver = new MutationObserver(() => {
-	if(document.getElementById('confPop').childNodes[0].innerHTML.includes('Are you sure you want to take action on') && document.getElementsByClassName('takeActionBtn tag').length == 1) {
+	console.log('observing');
+	if(document.getElementById('confPop').childNodes[0].innerHTML.includes('Are you sure you want to take action on') && document.getElementsByClassName('takeActionBtn tag').length == 1 && document.getElementsByClassName('customPunishHolder').length == 0) {
+		console.log('if');
 		document.getElementById('confPop').childNodes[0].style.textAlign = 'center';
-		let pnshBtn1 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(1));
-		let pnshBtn2 = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton(2));
+		let div = document.createElement('div');
+		div.className = 'customPunishHolder';
+		div = document.getElementById('confPop').appendChild(div);
+		let pnshBtn1 = div.appendChild(genPunishButton(1));
+		let pnshBtn2 = div.appendChild(genPunishButton(2));
+		let pnshBtn3 = div.appendChild(genPunishButton(3));
 		pnshBtn1.style.backgroundColor = '#414a6d';
 		pnshBtn2.style.backgroundColor = '#ed4242';
+		pnshBtn3.style.backgroundColor = '#e040fb';
 	}  
 });
 
@@ -388,10 +417,17 @@ function genPunishButton(number) {
 		span.innerHTML = 'Log';
 		span.className = 'takeActionBtn log';
 		span.onclick = function() { logPunish(); };
-	} else {
+		span.onmouseenter = function() { playTick(); };
+	} else if(number == 2) {
 		span.innerHTML = 'AIO';
 		span.className = 'takeActionBtn aio';
 		span.onclick = function() { aioPunish(); };
+		span.onmouseenter = function() { playTick(); };
+	} else if(number == 3) {
+		span.innerHTML = 'Follow';
+		span.className = 'takeActionBtn flw';
+		span.onclick = function() { followPlayer(); };
+		span.onmouseenter = function() { playTick(); };
 	}
 	return span;
 }
@@ -417,34 +453,53 @@ function aioPunish() {
 	document.getElementsByClassName('takeActionBtn aoi')[0].style.backgroundColor = 'green';
 }
 
+function followPlayer() {
+	console.log('followPlayer');
+	window.clearInterval(window.focusInterval);
+	suspect = document.getElementById('confPop').childNodes[0].innerHTML.split(' ').reverse()[0].slice(0, -1);
+	toggleSpect(true);
+	clearPops();
+	showWindow(0);
+	let divs0 = document.getElementsByClassName('specPlayerHolder0');
+	let divs1 = document.getElementsByClassName('specPlayerHolder1');
+	if(divs0.length != 0) {
+		console.log('divs0');
+		specHighlighter(divs0);
+	}
+	if(divs1.length != 0) {
+		console.log('divs1');
+		specHighlighter(divs1);
+	}
+}
+
 /*---------------------------------------------------------------------------Extra call info---------------------------------------------------------------------------*/
 
 const callInfoObserver = new MutationObserver(() => {
 	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
-		if(profName != null && profLVL != null && caller != null) {
+		if(suspect != null && suspectLVL != null && caller != null) {
 			if(senior) {
-				if(profLVL < 15) {
-					const text = 'https://krunker.io/social.html?p=profile&q=' + profName + '\n';
+				if(suspectLVL < 15) {
+					const text = 'https://krunker.io/social.html?p=profile&q=' + suspect + '\n';
 					logProfile(text);
 					remSessStorage();
 					if(autoOpenMenu) openKPDMenu();
 				} else {
 					remSessStorage();
-					openURL('/social.html?p=profile&q='+profName);
+					openURL('/social.html?p=profile&q='+suspect);
 				}
 			} else {
 				remSessStorage();
-				openURL('/social.html?p=profile&q='+profName);
+				openURL('/social.html?p=profile&q='+suspect);
 			}
 		}
 	}else if(document.getElementById('specKPDTxt').innerHTML == 'Case submitted!') {
 		console.log('not cheating');
 		remSessStorage();
 		if(autoOpenMenu) openKPDMenu();
-	}else if(document.getElementById('specKPDTxt').innerHTML == 'Is ' + profName + ' hacking? Caller: ' + caller) {
+	}else if(document.getElementById('specKPDTxt').innerHTML == 'Is ' + suspect + ' hacking? Caller: ' + caller) {
 		//if(sessionStorage.getItem('suspect') == null) document.getElementById('specKPDTxt').innerHTML = 'Suspect left the game';
 	}else if(document.getElementById('specKPDTxt').innerHTML.includes('Is Suspect hacking?') || (document.getElementById('specKPDTxt').innerHTML.includes('Is') && document.getElementById('specKPDTxt').innerHTML.includes('hacking?'))) {
-		document.getElementById('specKPDTxt').innerHTML = 'Is ' + profName + ' hacking? Caller: ' + caller;
+		document.getElementById('specKPDTxt').innerHTML = 'Is ' + suspect + ' hacking? Caller: ' + caller;
 	}
 });
 
@@ -456,13 +511,12 @@ function remSessStorage() {
 	sessionStorage.removeItem('caller');
 	sessionStorage.removeItem('suspect');
 	sessionStorage.removeItem('suspectLVL');
-	sessionStorage.removeItem('initSpec');
 }
 
 /*---------------------------------------------------------------------------Link Opener---------------------------------------------------------------------------*/
 
-function openProfLink (profName) {
-	window.open('https://krunker.io/social.html?p=profile&q=' + profName)
+function openProfLink (suspect) {
+	window.open('https://krunker.io/social.html?p=profile&q=' + suspect)
 }
 
 function openLink () {
@@ -566,7 +620,7 @@ module.exports = {
 			val: true,
             html: function() { return clientUtil.genCSettingsHTML(this) },
             set: value => {
-				if (value && sessionStorage.getItem('initSpec') == 'true'){
+				if (value){
 					console.log('specQOL started');
 					specObserver.observe(specTeam0, { childList: true });
 					specObserver.observe(specTeam1, { childList: true });
@@ -734,6 +788,11 @@ module.exports = {
 	},
 	run: () => {
 		window.addEventListener('DOMContentLoaded', (event) => {
+			suspect = sessionStorage.getItem('suspect');
+			suspectLVL = sessionStorage.getItem('suspectLVL');
+			caller = sessionStorage.getItem('caller');
+			console.log(caller);
+			console.log(suspect);
 			applyCSS();
 			let div = document.createElement('div');
 			div.id = 'linkOpener';
