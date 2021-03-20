@@ -26,7 +26,7 @@ YOUR LOG FILES ARE LOCATED IN Documents/KPD/banlog.txt.
 
 A new user will be greeted like this.
 
-![image](https://user-images.githubusercontent.com/79867635/111849816-d3269280-890e-11eb-99fc-aece93006e0d.png)
+![image](https://user-images.githubusercontent.com/79867635/111874043-9ea8ea00-8993-11eb-82e8-34c37dbd753e.png)
 
 
 Set your preferences and reload the window (F5 or F6).
@@ -39,9 +39,7 @@ Senior: Set if you are Senior or not (Defaults to off).
 
 KPD Menu Features: Adds a Searchbar to call list and ban logs. Supports pasting clipboard on right click. Highlights players based on your settings. Copies names out of Ban Logs via right click. Shows call region in call list.
 
-![image](https://user-images.githubusercontent.com/79867635/111846975-3103ac00-8908-11eb-9494-f1d459251a22.png)
-
-![image](https://user-images.githubusercontent.com/79867635/111848502-75447b80-890b-11eb-9a93-625cee6ae135.png)
+![image](https://user-images.githubusercontent.com/79867635/111874129-02cbae00-8994-11eb-99c3-e53545376fec.png)
 
 
 
