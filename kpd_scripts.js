@@ -29,7 +29,7 @@ let xrayState = true;
 /*---------------------------------------------------------------------------Chat Message Generation---------------------------------------------------------------------------*/
 
 function removeElement(element) {
-	setTimeout(function () { element.remove() }, 1500);
+	setTimeout(function () { element.remove() }, 2250);
 }
 
 function genChatMsg(text) {
