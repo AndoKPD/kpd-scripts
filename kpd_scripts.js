@@ -479,6 +479,7 @@ function openLink () {
 /*---------------------------------------------------------------------------Open KPD---------------------------------------------------------------------------*/
 
 function openKPDMenu() {
+	if(document.activeElement.tagName === 'INPUT') return;
 	document.exitPointerLock();
 	setTimeout( function() { shoPolicePop(); }, 200);
 }
@@ -486,6 +487,7 @@ function openKPDMenu() {
 /*---------------------------------------------------------------------------Suspect Focus---------------------------------------------------------------------------*/
 
 function toggleFocus() {
+	if(document.activeElement.tagName === 'INPUT') return;
 	if(localStorage.getItem('suspectFocus') == null) {
 		localStorage.setItem('suspectFocus', 'on');
 		genChatMsg('Suspect focus is on');
@@ -506,6 +508,7 @@ function toggleFocus() {
 /*---------------------------------------------------------------------------Hide Nametag Hotkey---------------------------------------------------------------------------*/
 
 function toggleXray() {
+	if(document.activeElement.tagName === 'INPUT') return;
 	if(xrayState) {
 		setSetting('hideNames', 0);
 		genChatMsg('X-Ray is on');
