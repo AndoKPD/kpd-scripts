@@ -16,6 +16,7 @@ const caller = sessionStorage.getItem('caller');
 /*User Set*/
 let senior = false;
 let detailedLog = false;
+let autoOpenMenu = false;
 let minLVL = 75;
 let highlightColor = '#63de26';
 let antiHighlightColor = '#fc3232';
@@ -406,7 +407,7 @@ const callInfoObserver = new MutationObserver(() => {
 					const text = '\n\nhttps://krunker.io/social.html?p=profile&q=' + profName;
 					logProfile(text);
 					remSessStorage();
-					openKPDMenu();
+					if(autoOpenMenu) openKPDMenu();
 				} else {
 					remSessStorage();
 					openURL('/social.html?p=profile&q='+profName);
@@ -419,7 +420,7 @@ const callInfoObserver = new MutationObserver(() => {
 	}else if(document.getElementById('specKPDTxt').innerHTML == 'Case submitted!') {
 		console.log('not cheating');
 		remSessStorage();
-		openKPDMenu();
+		if(autoOpenMenu) openKPDMenu();
 	}else if(document.getElementById('specKPDTxt').innerHTML == 'Is ' + profName + ' hacking? Caller: ' + caller) {
 		//if(sessionStorage.getItem('suspect') == null) document.getElementById('specKPDTxt').innerHTML = 'Suspect left the game';
 	}else if(document.getElementById('specKPDTxt').innerHTML.includes('Is Suspect hacking?') || (document.getElementById('specKPDTxt').innerHTML.includes('Is') && document.getElementById('specKPDTxt').innerHTML.includes('hacking?'))) {
@@ -604,6 +605,17 @@ module.exports = {
             html: function() { return clientUtil.genCSettingsHTML(this) },
             set: value => {
                 detailedLog = value;
+            }
+		},
+		autoOpenMenu: {
+			name: 'Automatically open KPD Menu after Call',
+			id: 'autoOpenMenu',
+			cat: 'KPD',
+			type: 'checkbox',
+			val: false,
+            html: function() { return clientUtil.genCSettingsHTML(this) },
+            set: value => {
+                autoOpenMenu = value;
             }
 		},
         suspectFocus: {
