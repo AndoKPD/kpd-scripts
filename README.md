@@ -47,9 +47,9 @@ Spectate Features: Highlights both caller and suspect in the spectate ui. Follow
 
 ![image](https://user-images.githubusercontent.com/79867635/111884523-708ece80-89c2-11eb-88d7-d0408a1df4a5.png)
 
-Alt Menu Buttons: Adds two buttons to the alt menu, 'Log' saves the suspects link to your logfile, 'AIO' flags, bans and logs the player without confirmation (Be careful).
+Alt Menu Buttons: Adds two buttons to the alt menu, 'Log' saves the suspects link to your logfile, 'AIO' flags, bans and logs the player without confirmation (Be careful), Focus highlights them in spec mode.
 
-![image](https://user-images.githubusercontent.com/79867635/111884566-bea3d200-89c2-11eb-9bdc-0c8a0d56da99.png)
+![image](https://user-images.githubusercontent.com/79867635/111884778-0545fc00-89c4-11eb-9d5e-ff0d796c4a76.png)
 
 Show Additional Call Info: Shows suspect and caller names in a call. After confirming it opens players profile based on your preferences. If you deny, it opens the KPD menu.
 
