@@ -134,7 +134,8 @@ function applyCSS() {
 						}
 						#hackText {
 							width: auto;
-							left: 36%;
+							left: 41%;
+							font-size: 40px;
 							background-color: transparent;
 						}`
 	}))
