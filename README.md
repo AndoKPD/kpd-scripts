@@ -45,22 +45,19 @@ KPD Menu Features: Adds a Searchbar to call list and ban logs. Supports pasting 
 
 Spectate Features: Highlights both caller and suspect in the spectate ui. Follows the suspect in kpd mode if enabled.
 
-![image](https://user-images.githubusercontent.com/79867635/111846999-42e54f00-8908-11eb-8759-e3e6db8a72c7.png)
-
+![image](https://user-images.githubusercontent.com/79867635/111884523-708ece80-89c2-11eb-88d7-d0408a1df4a5.png)
 
 Alt Menu Buttons: Adds two buttons to the alt menu, 'Log' saves the suspects link to your logfile, 'AIO' flags, bans and logs the player without confirmation (Be careful).
 
-![image](https://user-images.githubusercontent.com/79867635/111846939-1fba9f80-8908-11eb-8763-729e5ebdb5bf.png)
-
+![image](https://user-images.githubusercontent.com/79867635/111884566-bea3d200-89c2-11eb-9bdc-0c8a0d56da99.png)
 
 Show Additional Call Info: Shows suspect and caller names in a call. After confirming it opens players profile based on your preferences. If you deny, it opens the KPD menu.
 
-![image](https://user-images.githubusercontent.com/79867635/111847018-4b3d8a00-8908-11eb-89fd-1e0eb4a39bbc.png)
-
+![image](https://user-images.githubusercontent.com/79867635/111884530-7be1fa00-89c2-11eb-80c8-5b065b17445f.png)
 
 Show Open Link Button: Adds a 'Link' input element and a 'Open Link' button. Enter a players profile name and click 'Open Link' to quickly access it. If you have a profile link in your clipboard, it opens that instead.
 
-![image](https://user-images.githubusercontent.com/79867635/111846617-7ecbe480-8907-11eb-8ae4-aff6941f5e5b.png)
+![image](https://user-images.githubusercontent.com/79867635/111884545-99af5f00-89c2-11eb-837a-cb4550779ef0.png)
 
 Detailed Logs: It is designed to save the time (UTC) when the tag was executed, if you want to keep the video file on pc and not upload it.
 
@@ -71,8 +68,7 @@ Suspect Focus: Toggle if the suspect is followed in KPD mode.
 
 Hide Nametag: Toggles all nametags.
 
-![image](https://user-images.githubusercontent.com/79867635/111847265-bdae6a00-8908-11eb-84bc-e1d31190dbda.png)
-
+![image](https://user-images.githubusercontent.com/79867635/111884575-ce231b00-89c2-11eb-81e3-fac23c96ab86.png)
 
 KPD Menu: Opens the KPD menu.
 
@@ -95,7 +91,7 @@ Issues: If you don't open a players profile link but instead go on market, hub, 
 
 WARNING: No promt to confirm or anything, pressing the button tags. Be careful.
 	
-![image](https://user-images.githubusercontent.com/79867635/111847588-69f05080-8909-11eb-9080-f5e275fd7cd6.png)
+![image](https://user-images.githubusercontent.com/79867635/111884653-52759e00-89c3-11eb-9fce-25830d087014.png)
 
 
 
