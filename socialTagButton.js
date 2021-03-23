@@ -43,13 +43,13 @@ function webhookLog(text) {
 	request.send(JSON.stringify(params));
   }
 
-function logProfile(text) {
+function logProfile() {
 	let printText = 'https://krunker.io/social.html?p=profile&q=' + playerName + '\n' + text + '\n';
 	dirCheck();
 	if(sessionStorage.getItem('webhookLink') != null){
-		webhookLog(text);
+		webhookLog(printText);
 	}
-	writeToFile(logPath, text);
+	writeToFile(logPath, printText);
 }
 
 /*---------------------------------------------------------------------------FEATURES---------------------------------------------------------------------------*/
