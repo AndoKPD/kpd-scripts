@@ -23,8 +23,13 @@ let antiHighlightColor = '#fc3232';
 let suspect;
 let suspectLVL;
 let caller;
+let suspectID;
 let activeTab;
 let xrayState = true;
+let gameRegion;
+let kpdJoin = false;
+let webhookPfp = 'https://cdn.discordapp.com/attachments/777223017004662804/823959430998655106/a942b33ff309c9c1b98ea18581b9d470.png';
+let webhookLink;
 
 /*---------------------------------------------------------------------------Chat Message Generation---------------------------------------------------------------------------*/
 
@@ -131,7 +136,7 @@ function applyCSS() {
 	}));
 }
 
-/*---------------------------------------------------------------------------File IO---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------Logging---------------------------------------------------------------------------*/
 
 function dirCheck() {
 	if (!fs.existsSync(os.homedir() + '\\Documents\\KPD')){
@@ -148,8 +153,26 @@ function writeToFile(path, text) {
 	});
 }
 
+function webhookLog(text) {
+	var request = new XMLHttpRequest();
+	request.open('POST', webhookLink);
+
+	request.setRequestHeader('Content-type', 'application/json');
+
+	var params = {
+	  username: localStorage.getItem('username'),
+	  avatar_url: webhookPfp,
+	  content: text
+	}
+
+	request.send(JSON.stringify(params));
+  }
+
 function logProfile(text) {
 	dirCheck();
+	if(webhookLink != false){
+		webhookLog(text);
+	}
 	writeToFile(logPath, text);
 	if(detailedLog) {
 		let d = new Date();
@@ -247,6 +270,7 @@ function highlight() { //highlights calls
 			if(lvl[i].childNodes[1].innerHTML >= minLVL) lvl[i].childNodes[1].style.color = highlightColor; //highlight the number
 			if(senior) {
 				if(lvl[i].childNodes[4].innerHTML < 15) {
+					console.log('highlighting green');
 					lvl[i].childNodes[4].style.color = highlightColor;
 				} else {
 					lvl[i].childNodes[4].style.color = antiHighlightColor;
@@ -266,6 +290,7 @@ function joinKPD(joinFunc, caller, suspect, suspectLVL) {
 	sessionStorage.setItem('caller', caller);
 	sessionStorage.setItem('suspect', suspect);
 	sessionStorage.setItem('suspectLVL', suspectLVL);
+	sessionStorage.setItem('kpdJoin', 'true');
 	const f = new Function(joinFunc);
 	f();
 }
@@ -341,7 +366,6 @@ function execCopy(elem) {
 	setTimeout(function() { elem.innerHTML = name }, 800);
 }
 
-
 /*---------------------------------------------------------------------------Spectate QOL---------------------------------------------------------------------------*/
 
 const specObserver = new MutationObserver(() => {
@@ -377,9 +401,12 @@ function specHighlighter(divs) {
 			divs[i].childNodes[2].style.color = '#c00000';
 			divs[i].childNodes[2].style.textShadow = 'none';
 			divs[i].childNodes[0].setAttribute('style', 'outline: solid 4px #c00000;')
-			if(sessionStorage.getItem('suspect') == null) divs[i].childNodes[5].id = 'specKPDSuspect';
+			if(sessionStorage.getItem('suspect') == null){
+				divs[i].childNodes[5].id = 'specKPDSuspect';
+				divs[i].childNodes[5].innerHTML = 'search';
+			} 
 			if(localStorage.getItem('suspectFocus') != null) {
-				window.focusInterval = setInterval(function() { focusPlayer(divs[i].childNodes[3].innerHTML); }, 1000);	
+				window.focusInterval = setInterval(function() { console.log(divs[i].childNodes[3].innerHTML); focusPlayer(divs[i].childNodes[3].innerHTML); }, 1000);	
 			}
 			console.log('suspect found');
 		}
@@ -399,36 +426,49 @@ const popupObserver = new MutationObserver(() => {
 	if(document.getElementById('confPop').childNodes[0].innerHTML.includes('Are you sure you want to take action on') && document.getElementsByClassName('takeActionBtn tag').length == 1 && document.getElementsByClassName('customPunishHolder').length == 0) {
 		console.log('if');
 		document.getElementById('confPop').childNodes[0].style.textAlign = 'center';
-		let div = document.createElement('div');
-		div.className = 'customPunishHolder';
-		div = document.getElementById('confPop').appendChild(div);
-		let pnshBtn1 = div.appendChild(genPunishButton(1));
-		let pnshBtn2 = div.appendChild(genPunishButton(2));
-		let pnshBtn3 = div.appendChild(genPunishButton(3));
-		pnshBtn1.style.backgroundColor = '#414a6d';
-		pnshBtn2.style.backgroundColor = '#ed4242';
-		pnshBtn3.style.backgroundColor = '#e040fb';
+		let aioBtn = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton());
+		aioBtn.style.backgroundColor = '#414a6d';
 	}  
 });
 
-function genPunishButton(number) {
+const menuObserver = new MutationObserver(() => {
+	console.log('menu observing');
+	if(document.getElementById('menuWindow').childNodes[0].innerText.includes('Player List')) {
+		console.log('player list');
+		let actionList = document.getElementsByClassName('pListActions');
+		let i = 0;
+		if(actionList[0].outerHTML.includes('Kick Spec')) i++;
+		for(i; i < actionList.length; i++) {
+			let tempElem = actionList[i].appendChild(genSpecButton());
+			if(document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('href').split('=').reverse()[0] == suspect) {
+				tempElem.childNodes[0].innerHTML = 'visibility_off';
+				tempElem.style.color = 'red';
+				tempElem.onclick = function() { unfocusPlayer(); tempElem.childNodes[0].innerHTML = 'visibility'; };
+			} else {
+				let infoElem = document.getElementsByClassName('pListName')[i].childNodes[0];
+				tempElem.onclick = function() { altfocusPlayer(infoElem.getAttribute('href').split('=').reverse()[0], infoElem.getAttribute('oncontextmenu').split('"')[1]) };
+			}
+		}
+	}  
+});
+
+function genSpecButton() {
+	let spanBtn = document.createElement('span');
+	let spanIcon = document.createElement('span');
+	spanBtn.className = 'punishButton kdf';
+	spanIcon.className = 'takeAction material-icons';
+	spanIcon.innerHTML = 'visibility';
+	spanBtn.onmouseenter = function() { playTick(); };
+	spanBtn.appendChild(spanIcon);
+	return spanBtn;
+}
+
+function genPunishButton() {
 	let span = document.createElement('span');
-	if(number == 1) {
-		span.innerHTML = 'Log';
-		span.className = 'takeActionBtn log';
-		span.onclick = function() { logPunish(); };
-		span.onmouseenter = function() { playTick(); };
-	} else if(number == 2) {
-		span.innerHTML = 'AIO';
-		span.className = 'takeActionBtn aio';
-		span.onclick = function() { aioPunish(); };
-		span.onmouseenter = function() { playTick(); };
-	} else if(number == 3) {
-		span.innerHTML = 'Focus';
-		span.className = 'takeActionBtn fcs';
-		span.onclick = function() { followPlayer(); };
-		span.onmouseenter = function() { playTick(); };
-	}
+	span.innerHTML = 'AIO';
+	span.className = 'takeActionBtn aio';
+	span.onclick = function() { aioPunish(); };
+	span.onmouseenter = function() { playTick(); };
 	return span;
 }
 
@@ -436,12 +476,6 @@ function getAltMenuLogText() {
 	let profLink = 'https://krunker.io/social.html?p=profile&q=';
 	profLink += document.getElementById('confPop').childNodes[0].innerHTML.split(' ').reverse()[0].slice(0, -1);
 	return profLink + '\n';
-}
-
-function logPunish() {
-	const text = getAltMenuLogText();
-	logProfile(text);
-	document.getElementsByClassName('takeActionBtn log')[0].style.backgroundColor = 'green';
 }
 
 function aioPunish() {
@@ -453,12 +487,14 @@ function aioPunish() {
 	document.getElementsByClassName('takeActionBtn aoi')[0].style.backgroundColor = 'green';
 }
 
-function followPlayer() {
-	console.log('followPlayer');
-	window.clearInterval(window.focusInterval);
-	suspect = document.getElementById('confPop').childNodes[0].innerHTML.split(' ').reverse()[0].slice(0, -1);
+function altfocusPlayer(focusName, focusID) {
+	console.log('focusPlayer ' + focusName + ' ID ' +focusID);
+	if(suspect != null) unfocusPlayer();
+	kpdJoin = false;
+	suspect = focusName;
+	suspectID = focusID;
+	genChatMsg('Suspect set: ' + suspect);
 	toggleSpect(true);
-	clearPops();
 	showWindow(0);
 	let divs0 = document.getElementsByClassName('specPlayerHolder0');
 	let divs1 = document.getElementsByClassName('specPlayerHolder1');
@@ -470,11 +506,71 @@ function followPlayer() {
 		console.log('divs1');
 		specHighlighter(divs1);
 	}
+	console.log('contr display');
+	document.getElementById('specKPDContr').style.display = 'block';
+	document.getElementById('specKRHid').style.display = 'block';
+	document.getElementById('specKPDTxt').innerHTML = 'Is ' + suspect + ' hacking?';
+	console.log('kpd text edited focus');
+	document.addEventListener('keydown', banHandler);
+}
+
+function banHandler(e) {
+	console.log('banfunc eventlistener ' + e.key);
+		if(document.activeElement.tagName === 'INPUT') return;
+		switch(e.key) {
+			case 'y':
+				flagPlayerConfirmed(suspectID);
+				banPlayerConfirmed(suspectID);
+				if(!(/^Guest_[0-9]$/.test(suspect))) logProfile('https://krunker.io/social.html?p=profile&q=' + suspect);
+				unfocusPlayer();
+				break;
+
+			case 'n': 
+				pressButton(78);
+				unfocusPlayer();
+				break;
+		}
+}
+
+function unfocusPlayer() {
+	console.log('unfocusPlayer');
+	window.clearInterval(window.focusInterval);
+	document.removeEventListener('keydown', banHandler);
+	document.getElementById('specKPDContr').style.display = 'none';
+	genChatMsg('Suspect removed: ' + suspect);
+	let divs0 = document.getElementsByClassName('specPlayerHolder0');
+	let divs1 = document.getElementsByClassName('specPlayerHolder1');
+	if(divs0.length != 0) {
+		stopHighlight(divs0);
+	}
+	if(divs1.length != 0) {
+		stopHighlight(divs1);
+	}
+	suspect = null;
+	suspectID = null;
+	caller = null;
+	suspectLVL = null;
+	remSessStorage();
+}
+
+function stopHighlight(divs) {
+	for(let i = 0; i < divs.length; i++) {
+		if(divs[i].childNodes[2].innerHTML == suspect) {
+			divs[i].childNodes[2].style.color = 'white';
+			divs[i].childNodes[2].style.textShadow = 'none';
+			divs[i].childNodes[0].setAttribute('style', 'outline: none;');
+			divs[i].childNodes[2].style.textShadow = 'unset';
+			divs[i].childNodes[5].id = 'specKPD';
+			console.log('suspect removed');
+		}
+	}
 }
 
 /*---------------------------------------------------------------------------Extra call info---------------------------------------------------------------------------*/
 
 const callInfoObserver = new MutationObserver(() => {
+	gameRegion = getGameRegion();
+	if(!kpdJoin) return;
 	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
 		if(suspect != null && suspectLVL != null && caller != null) {
 			if(senior) {
@@ -500,8 +596,19 @@ const callInfoObserver = new MutationObserver(() => {
 		//if(sessionStorage.getItem('suspect') == null) document.getElementById('specKPDTxt').innerHTML = 'Suspect left the game';
 	}else if(document.getElementById('specKPDTxt').innerHTML.includes('Is Suspect hacking?') || (document.getElementById('specKPDTxt').innerHTML.includes('Is') && document.getElementById('specKPDTxt').innerHTML.includes('hacking?'))) {
 		document.getElementById('specKPDTxt').innerHTML = 'Is ' + suspect + ' hacking? Caller: ' + caller;
+		document.getElementById('specKRHid').childNodes[3].innerHTML = gameRegion;
+		document.getElementById('specKRHid').childNodes[3].setAttribute('style', 'width: auto; display: inline-block; margin-left: 15px;');
 	}
 });
+
+function getGameRegion() {
+	let region = document.getElementById('menuRegionLabel').innerHTML
+	if(region != '...') { //if data is present
+		return region;
+	}else {
+		setTimeout(getGameRegion, 20); //try again
+	}	
+}
 
 function remSessStorage() {
 	if(window.focusInterval != undefined && window.focusInterval != 'undefined'){
@@ -511,6 +618,7 @@ function remSessStorage() {
 	sessionStorage.removeItem('caller');
 	sessionStorage.removeItem('suspect');
 	sessionStorage.removeItem('suspectLVL');
+	kpdJoin = false;
 }
 
 /*---------------------------------------------------------------------------Link Opener---------------------------------------------------------------------------*/
@@ -609,7 +717,7 @@ module.exports = {
                 if (value){
                     return kpdObserver.observe(policePopC, { childList: true });
                 }
-                kpdObserver.disconnect()
+                kpdObserver.disconnect();
             }
         },
         specQOL: {
@@ -638,9 +746,12 @@ module.exports = {
             html: function() { return clientUtil.genCSettingsHTML(this) },
             set: value => {
                 if (value){
-                    return popupObserver.observe(confPop, { childList: true });
+                    popupObserver.observe(confPop, { childList: true });
+					menuObserver.observe(menuWindow, { childList: true });
+					return;
                 }
-                popupObserver.disconnect()
+                popupObserver.disconnect();
+				menuObserver.disconnect();
             }
         },
         extraCallInfo: {
@@ -654,7 +765,7 @@ module.exports = {
                 if (value){
                     return callInfoObserver.observe(specKPDTxt, { childList: true });
                 }
-                callInfoObserver.disconnect()
+                callInfoObserver.disconnect();
             }
         },
 		linkOpener: {
@@ -781,18 +892,71 @@ module.exports = {
             html: function(){ return clientUtil.genCSettingsHTML(this); },
 			set: value => {
 				if (value !== '' && /^#[A-F0-9]+$/.test(value)) {
-					highlightColor = value;
+					antiHighlightColor = value;
+				}
+			}
+        },
+		webhookLink: {
+            name: 'Webhook Link',
+            id: 'webhookPfp',
+            cat: 'KPD',
+            type: 'text',
+            val: '',
+            placeholder: 'Empty = Off',
+            html: function(){ return clientUtil.genCSettingsHTML(this); },
+			set: value => {
+				if (value == '') {
+					webhookLink = value;
+				} else {
+					webhookLink = false;
+				}
+			}
+        },
+		webhookPfp: {
+            name: 'Webhook Profile Picture',
+            id: 'webhookPfp',
+            cat: 'KPD',
+            type: 'text',
+            val: '',
+            placeholder: 'Empty = KPD Logo',
+            html: function(){ return clientUtil.genCSettingsHTML(this); },
+			set: value => {
+				if (value == '') {
+					webhookPfp = value;
 				}
 			}
         }
 	},
 	run: () => {
 		window.addEventListener('DOMContentLoaded', (event) => {
-			suspect = sessionStorage.getItem('suspect');
-			suspectLVL = sessionStorage.getItem('suspectLVL');
-			caller = sessionStorage.getItem('caller');
+			if(sessionStorage.getItem('kpdJoin') == 'true') {
+				kpdJoin = true;
+				suspect = sessionStorage.getItem('suspect');
+				suspectLVL = sessionStorage.getItem('suspectLVL');
+				caller = sessionStorage.getItem('caller');
+				sessionStorage.removeItem('kpdJoin');
+			} else {
+				suspect = null;
+				suspectLVL = null;
+				caller = null;
+				remSessStorage();
+			}
+			if(localStorage.getItem('username') == null) {
+				var timer = window.setInterval(function() {
+					if (document.getElementById('menuAccountUsername').innerHTML != '?') {
+						window.clearInterval(timer);
+						showWindow(5);
+						showWindow(0);
+						localStorage.setItem('username', document.getElementsByClassName('settName')[0].innerText.slice(4));
+					}
+				}, 100);
+			}
+			console.log(localStorage.getItem('username'));
+			suspectID = null;
+			gameRegion = getGameRegion();
 			console.log(caller);
 			console.log(suspect);
+			console.log(kpdJoin);
 			applyCSS();
 			let div = document.createElement('div');
 			div.id = 'linkOpener';
