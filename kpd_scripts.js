@@ -28,8 +28,6 @@ let activeTab;
 let xrayState = true;
 let gameRegion;
 let kpdJoin = false;
-let webhookPfp = 'https://cdn.discordapp.com/attachments/777223017004662804/823959430998655106/a942b33ff309c9c1b98ea18581b9d470.png';
-let webhookLink;
 
 /*---------------------------------------------------------------------------Chat Message Generation---------------------------------------------------------------------------*/
 
@@ -155,13 +153,13 @@ function writeToFile(path, text) {
 
 function webhookLog(text) {
 	var request = new XMLHttpRequest();
-	request.open('POST', webhookLink);
+	request.open('POST', sessionStorage.getItem('webhookLink'));
 
 	request.setRequestHeader('Content-type', 'application/json');
 
 	var params = {
 	  username: localStorage.getItem('username'),
-	  avatar_url: webhookPfp,
+	  avatar_url: sessionStorage.getItem('webhookPfp'),
 	  content: text
 	}
 
@@ -170,7 +168,7 @@ function webhookLog(text) {
 
 function logProfile(text) {
 	dirCheck();
-	if(webhookLink != false){
+	if(sessionStorage.getItem('webhookLink') != null){
 		webhookLog(text);
 	}
 	writeToFile(logPath, text);
@@ -906,9 +904,9 @@ module.exports = {
             html: function(){ return clientUtil.genCSettingsHTML(this); },
 			set: value => {
 				if (value == '') {
-					webhookLink = value;
+					sessionStorage.setItem('webhookLink', value);
 				} else {
-					webhookLink = false;
+					if(sessionStorage.getItem('webhookLink') != null) sessionStorage.removeItem('webhookLink');
 				}
 			}
         },
@@ -922,7 +920,9 @@ module.exports = {
             html: function(){ return clientUtil.genCSettingsHTML(this); },
 			set: value => {
 				if (value == '') {
-					webhookPfp = value;
+					sessionStorage.setItem('webhookPfp', value);
+				} else {
+					sessionStorage.setItem('webhookPfp', 'https://cdn.discordapp.com/attachments/777223017004662804/823959430998655106/a942b33ff309c9c1b98ea18581b9d470.png')
 				}
 			}
         }
