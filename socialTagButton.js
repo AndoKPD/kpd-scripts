@@ -6,13 +6,12 @@ const fs = require('fs');
 const os = require('os');
 const { clipboard } = require('electron');
 const logPath = os.homedir() + '\\Documents\\KPD\\banlog.txt';
-const detailedPath = os.homedir() + '\\Documents\\KPD\\detailed_log.txt';
 
 /*---------------------------------------------------------------------------Variables---------------------------------------------------------------------------*/
 
 let playerName;
 
-/*---------------------------------------------------------------------------File IO---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------Logging---------------------------------------------------------------------------*/
 
 function dirCheck() {
 	if (!fs.existsSync(os.homedir() + '\\Documents\\KPD')){
@@ -29,12 +28,28 @@ function writeToFile(path, text) {
 	});
 }
 
+function webhookLog(text) {
+	var request = new XMLHttpRequest();
+	request.open('POST', sessionStorage.getItem('webhookLink'));
+
+	request.setRequestHeader('Content-type', 'application/json');
+
+	var params = {
+	  username: localStorage.getItem('username'),
+	  avatar_url: sessionStorage.getItem('webhookPfp'),
+	  content: text
+	}
+
+	request.send(JSON.stringify(params));
+  }
+
 function logProfile(text) {
 	let printText = 'https://krunker.io/social.html?p=profile&q=' + playerName + '\n' + text + '\n';
 	dirCheck();
-	writeToFile(logPath, printText);
-	let d = new Date();
-	writeToFile(detailedPath, printText + '\n' + d.toUTCString());
+	if(sessionStorage.getItem('webhookLink') != null){
+		webhookLog(text);
+	}
+	writeToFile(logPath, text);
 }
 
 /*---------------------------------------------------------------------------FEATURES---------------------------------------------------------------------------*/
