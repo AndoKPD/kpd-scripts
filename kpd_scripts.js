@@ -896,7 +896,7 @@ module.exports = {
         },
 		webhookLink: {
             name: 'Webhook Link',
-            id: 'webhookPfp',
+            id: 'webhookLink',
             cat: 'KPD',
             type: 'text',
             val: '',
