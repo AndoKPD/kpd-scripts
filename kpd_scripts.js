@@ -903,7 +903,7 @@ module.exports = {
             placeholder: 'Empty = Off',
             html: function(){ return clientUtil.genCSettingsHTML(this); },
 			set: value => {
-				if (value == '') {
+				if (value !== '') {
 					sessionStorage.setItem('webhookLink', value);
 				} else {
 					if(sessionStorage.getItem('webhookLink') != null) sessionStorage.removeItem('webhookLink');
@@ -919,7 +919,7 @@ module.exports = {
             placeholder: 'Empty = KPD Logo',
             html: function(){ return clientUtil.genCSettingsHTML(this); },
 			set: value => {
-				if (value == '') {
+				if (value !== '') {
 					sessionStorage.setItem('webhookPfp', value);
 				} else {
 					sessionStorage.setItem('webhookPfp', 'https://cdn.discordapp.com/attachments/777223017004662804/823959430998655106/a942b33ff309c9c1b98ea18581b9d470.png')
