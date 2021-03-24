@@ -438,13 +438,24 @@ const menuObserver = new MutationObserver(() => {
 		if(actionList[0].outerHTML.includes('Kick Spec')) i++;
 		for(i; i < actionList.length; i++) {
 			let tempElem = actionList[i].appendChild(genSpecButton());
-			if(document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('href').split('=').reverse()[0] == suspect) {
+			let tmpSuspect;
+			let tmpID;
+			if(document.getElementsByClassName('pListName')[i].childNodes[0].tagName != 'A') {
+				console.log('spec if' + i)
+				tmpSuspect = document.getElementsByClassName('pListName')[i].childNodes[1].getAttribute('href').split('=').reverse()[0];
+				tmpID = document.getElementsByClassName('pListName')[i].childNodes[1].getAttribute('oncontextmenu').split('"')[1];
+			} else {
+				console.log('spec else')
+				tmpSuspect = document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('href').split('=').reverse()[0];
+				tmpID = document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('oncontextmenu').split('"')[1];
+			}
+						
+			if(tmpSuspect == suspect) {
 				tempElem.childNodes[0].innerHTML = 'visibility_off';
 				tempElem.style.color = 'red';
 				tempElem.onclick = function() { unfocusPlayer(); tempElem.childNodes[0].innerHTML = 'visibility'; };
 			} else {
-				let infoElem = document.getElementsByClassName('pListName')[i].childNodes[0];
-				tempElem.onclick = function() { altfocusPlayer(infoElem.getAttribute('href').split('=').reverse()[0], infoElem.getAttribute('oncontextmenu').split('"')[1]) };
+				tempElem.onclick = function() { altfocusPlayer(tmpSuspect, tmpID) };
 			}
 		}
 	}  
