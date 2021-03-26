@@ -134,9 +134,7 @@ function applyCSS() {
 							border-collapse: separate;
 						}
 						#menuWindow > table > tbody > tr:hover {
-							border-bottom: 3px solid red;
-							cursor: pointer;
-							z-index: 999;
+							border-bottom: 3px solid #fc3232;
 						}
 						.punishButton.kpd {
 							background-color: #414a6d;
