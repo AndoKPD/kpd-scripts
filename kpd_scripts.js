@@ -147,6 +147,7 @@ function writeToFile(path, text) {
 		if (err) {
 			throw err;
 		}
+		genChatMsg('Tag logged');
 		console.log('Tag logged.');
 	});
 }
@@ -419,16 +420,6 @@ function focusPlayer(number) {
 
 /*---------------------------------------------------------------------------Alt Menu Buttons---------------------------------------------------------------------------*/
 
-const popupObserver = new MutationObserver(() => {
-	console.log('observing');
-	if(document.getElementById('confPop').childNodes[0].innerHTML.includes('Are you sure you want to take action on') && document.getElementsByClassName('takeActionBtn tag').length == 1 && document.getElementsByClassName('customPunishHolder').length == 0) {
-		console.log('if');
-		document.getElementById('confPop').childNodes[0].style.textAlign = 'center';
-		let aioBtn = document.getElementById('confPop').childNodes[1].appendChild(genPunishButton());
-		aioBtn.style.backgroundColor = '#414a6d';
-	}  
-});
-
 const menuObserver = new MutationObserver(() => {
 	console.log('menu observing');
 	if(document.getElementById('menuWindow').childNodes[0].innerText.includes('Player List')) {
@@ -437,7 +428,8 @@ const menuObserver = new MutationObserver(() => {
 		let i = 0;
 		if(actionList[0].outerHTML.includes('Kick Spec')) i++;
 		for(i; i < actionList.length; i++) {
-			let tempElem = actionList[i].appendChild(genSpecButton());
+			let tempSpec = actionList[i].appendChild(genSpecButton());
+			let tempPunish = actionList[i].appendChild(genPunishButton());
 			let tmpSuspect;
 			let tmpID;
 			if(document.getElementsByClassName('pListName')[i].childNodes[0].tagName != 'A') {
@@ -451,12 +443,14 @@ const menuObserver = new MutationObserver(() => {
 			}
 						
 			if(tmpSuspect == suspect) {
-				tempElem.childNodes[0].innerHTML = 'visibility_off';
-				tempElem.style.color = 'red';
-				tempElem.onclick = function() { unfocusPlayer(); tempElem.childNodes[0].innerHTML = 'visibility'; };
+				tempSpec.childNodes[0].innerHTML = 'visibility_off';
+				tempSpec.style.color = 'red';
+				tempSpec.onclick = function() { unfocusPlayer(); tempSpec.childNodes[0].innerHTML = 'visibility'; };
+				tempPunish.style.backgroundColor = '#fc3232';
 			} else {
-				tempElem.onclick = function() { altfocusPlayer(tmpSuspect, tmpID) };
+				tempSpec.onclick = function() { altfocusPlayer(tmpSuspect, tmpID) };
 			}
+			tempPunish.onclick = function() { aioPunish(tmpSuspect, tmpID) };
 		}
 	}  
 });
@@ -473,27 +467,20 @@ function genSpecButton() {
 }
 
 function genPunishButton() {
-	let span = document.createElement('span');
-	span.innerHTML = 'AIO';
-	span.className = 'takeActionBtn aio';
-	span.onclick = function() { aioPunish(); };
-	span.onmouseenter = function() { playTick(); };
-	return span;
+	let spanBtn = document.createElement('span');
+	let spanIcon = document.createElement('span');
+	spanBtn.className = 'punishButton kdf';
+	spanIcon.className = 'takeAction material-icons';
+	spanIcon.innerHTML = 'delete';
+	spanBtn.onmouseenter = function() { playTick(); };
+	spanBtn.appendChild(spanIcon);
+	return spanBtn;
 }
 
-function getAltMenuLogText() {
-	let profLink = 'https://krunker.io/social.html?p=profile&q=';
-	profLink += document.getElementById('confPop').childNodes[0].innerHTML.split(' ').reverse()[0].slice(0, -1);
-	return profLink + '\n';
-}
-
-function aioPunish() {
-	let playerID = document.getElementById('confPop').childNodes[1].childNodes[1].getAttribute('onclick').toString().split('"')[1];
-	const text = getAltMenuLogText();
-	flagPlayerConfirmed(playerID);
-	banPlayerConfirmed(playerID);
-	logProfile(text);
-	document.getElementsByClassName('takeActionBtn aoi')[0].style.backgroundColor = 'green';
+function aioPunish(focusName, focusID) {
+	flagPlayerConfirmed(focusID);
+	banPlayerConfirmed(focusID);
+	if(!(/^Guest_[0-9]$/.test(focusName))) logProfile('https://krunker.io/social.html?p=profile&q=' + focusName);
 }
 
 function altfocusPlayer(focusName, focusID) {
@@ -539,6 +526,7 @@ function banHandler(e) {
 				unfocusPlayer();
 				break;
 		}
+		toggleSpect(false);
 }
 
 function unfocusPlayer() {
@@ -560,6 +548,8 @@ function unfocusPlayer() {
 	caller = null;
 	suspectLVL = null;
 	remSessStorage();
+	document.exitPointerLock();
+	showWindow(23);
 }
 
 function stopHighlight(divs) {
@@ -606,7 +596,8 @@ const callInfoObserver = new MutationObserver(() => {
 	}else if(document.getElementById('specKPDTxt').innerHTML.includes('Is Suspect hacking?') || (document.getElementById('specKPDTxt').innerHTML.includes('Is') && document.getElementById('specKPDTxt').innerHTML.includes('hacking?'))) {
 		document.getElementById('specKPDTxt').innerHTML = 'Is ' + suspect + ' hacking? Caller: ' + caller;
 		document.getElementById('specKRHid').childNodes[3].innerHTML = gameRegion;
-		document.getElementById('specKRHid').childNodes[3].setAttribute('style', 'width: auto; display: inline-block; margin-left: 15px;');
+		document.getElementById('specKRHid').childNodes[3].id = 'specKPDRegion';
+		document.getElementById('specKRHid').childNodes[3].setAttribute('style', 'width: auto; display: inline-block; color: white; margin-left: 15px;');
 	}
 });
 
@@ -755,11 +746,9 @@ module.exports = {
             html: function() { return clientUtil.genCSettingsHTML(this) },
             set: value => {
                 if (value){
-                    popupObserver.observe(confPop, { childList: true });
 					menuObserver.observe(menuWindow, { childList: true });
 					return;
                 }
-                popupObserver.disconnect();
 				menuObserver.disconnect();
             }
         },
