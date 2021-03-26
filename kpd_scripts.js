@@ -594,6 +594,7 @@ function unfocusPlayer() {
 	remSessStorage();
 	document.exitPointerLock();
 	showWindow(23);
+	showWindow(23);
 }
 
 function stopHighlight(divs) {
