@@ -28,6 +28,8 @@ let activeTab;
 let xrayState = true;
 let gameRegion;
 let kpdJoin = false;
+let frozen = false;
+let oldTr;
 
 /*---------------------------------------------------------------------------Chat Message Generation---------------------------------------------------------------------------*/
 
@@ -130,6 +132,20 @@ function applyCSS() {
 							width: 100%;
 							border-spacing: 7px;
 							border-collapse: separate;
+						}
+						#menuWindow > table > tbody > tr:hover {
+							border-bottom: 3px solid red;
+							cursor: pointer;
+							z-index: 999;
+						}
+						.punishButton.kpd {
+							background-color: #414a6d;
+							float: left;
+							margin-top: 0px;
+							position: relative;
+						}
+						.pListName {
+							padding-left: unset;
 						}`
 	}));
 }
@@ -422,43 +438,61 @@ function focusPlayer(number) {
 
 const menuObserver = new MutationObserver(() => {
 	console.log('menu observing');
-	if(document.getElementById('menuWindow').childNodes[0].innerText.includes('Player List')) {
-		console.log('player list');
-		let actionList = document.getElementsByClassName('pListActions');
-		let i = 0;
-		if(actionList[0].outerHTML.includes('Kick Spec')) i++;
-		for(i; i < actionList.length; i++) {
-			let tempSpec = actionList[i].appendChild(genSpecButton());
-			let tempPunish = actionList[i].appendChild(genPunishButton());
-			let tmpSuspect;
-			let tmpID;
-			if(document.getElementsByClassName('pListName')[i].childNodes[0].tagName != 'A') {
-				console.log('spec if' + i)
-				tmpSuspect = document.getElementsByClassName('pListName')[i].childNodes[1].getAttribute('href').split('=').reverse()[0];
-				tmpID = document.getElementsByClassName('pListName')[i].childNodes[1].getAttribute('oncontextmenu').split('"')[1];
-			} else {
-				console.log('spec else')
-				tmpSuspect = document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('href').split('=').reverse()[0];
-				tmpID = document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('oncontextmenu').split('"')[1];
+	if(document.getElementById('menuWindow').outerHTML.includes('Player List')) {
+		document.getElementById('menuWindow').firstChild.insertBefore(genDiv(), document.getElementById('menuWindow').firstChild.childNodes[2]);
+		if(frozen) {
+			console.log('menu frozen');
+			document.getElementById('menuWindow').lastChild.firstChild.remove();
+			document.getElementById('menuWindow').lastChild.appendChild(oldTr);
+		} else {
+			console.log('player list');
+			let trList = document.getElementById('menuWindow').getElementsByTagName('tr');
+			let i = 0;
+			if(trList[0].outerHTML.includes('Kick Spec')) i++;
+			for(i; i < trList.length; i++) {
+				let tempPunish = trList[i].insertBefore(genPunishButton(), trList[i].firstChild);
+				let tempSpec = trList[i].insertBefore(genSpecButton(), trList[i].firstChild);
+				let tmpSuspect;
+				let tmpID;
+				if(document.getElementsByClassName('pListName')[i].childNodes[0].tagName != 'A') {
+					tmpSuspect = document.getElementsByClassName('pListName')[i].childNodes[1].getAttribute('href').split('=').reverse()[0];
+					tmpID = document.getElementsByClassName('pListName')[i].childNodes[1].getAttribute('oncontextmenu').split('"')[1];
+				} else {
+					tmpSuspect = document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('href').split('=').reverse()[0];
+					tmpID = document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('oncontextmenu').split('"')[1];
+				}
+							
+				if(tmpSuspect == suspect) {
+					tempSpec.childNodes[0].innerHTML = 'visibility_off';
+					tempSpec.style.color = 'red';
+					tempSpec.onclick = function() { unfocusPlayer(); tempSpec.childNodes[0].innerHTML = 'visibility'; };
+					tempSpec.style.left = '-2px';
+					tempPunish.style.left = '-2px';
+					tempPunish.style.backgroundColor = antiHighlightColor;
+					trList[i].style.border = '3px solid ' + antiHighlightColor;
+				} else {
+					tempSpec.onclick = function() { altfocusPlayer(tmpSuspect, tmpID) };
+				}
+				tempPunish.onclick = function() { aioPunish(tmpSuspect, tmpID); };
 			}
-						
-			if(tmpSuspect == suspect) {
-				tempSpec.childNodes[0].innerHTML = 'visibility_off';
-				tempSpec.style.color = 'red';
-				tempSpec.onclick = function() { unfocusPlayer(); tempSpec.childNodes[0].innerHTML = 'visibility'; };
-				tempPunish.style.backgroundColor = '#fc3232';
-			} else {
-				tempSpec.onclick = function() { altfocusPlayer(tmpSuspect, tmpID) };
-			}
-			tempPunish.onclick = function() { aioPunish(tmpSuspect, tmpID) };
+			oldTr = document.getElementById('menuWindow').lastChild.firstChild;
 		}
 	}  
 });
 
+function genDiv() {
+	let divElem = document.createElement('div');
+	if(frozen) divElem.innerHTML = 'Unfreeze';
+	else divElem.innerHTML = 'Freeze';
+    divElem.id = 'freezeMenu';
+    divElem.onclick = () => freeze();
+	return divElem;
+}
+
 function genSpecButton() {
 	let spanBtn = document.createElement('span');
 	let spanIcon = document.createElement('span');
-	spanBtn.className = 'punishButton kdf';
+	spanBtn.className = 'punishButton kpd';
 	spanIcon.className = 'takeAction material-icons';
 	spanIcon.innerHTML = 'visibility';
 	spanBtn.onmouseenter = function() { playTick(); };
@@ -469,7 +503,7 @@ function genSpecButton() {
 function genPunishButton() {
 	let spanBtn = document.createElement('span');
 	let spanIcon = document.createElement('span');
-	spanBtn.className = 'punishButton kdf';
+	spanBtn.className = 'punishButton kpd';
 	spanIcon.className = 'takeAction material-icons';
 	spanIcon.innerHTML = 'delete';
 	spanBtn.onmouseenter = function() { playTick(); };
@@ -477,10 +511,23 @@ function genPunishButton() {
 	return spanBtn;
 }
 
+function freeze() {
+	if(frozen) {
+		console.log('unfreezing');
+		frozen = false;
+		showWindow(23);
+		showWindow(23);
+	} else {
+		console.log('freezing');
+		document.getElementById('freezeMenu').innerHTML = 'Unfreeze';
+		frozen = true;
+	}
+}
+
 function aioPunish(focusName, focusID) {
 	flagPlayerConfirmed(focusID);
 	banPlayerConfirmed(focusID);
-	if(!(/^Guest_[0-9]$/.test(focusName))) logProfile('https://krunker.io/social.html?p=profile&q=' + focusName);
+	if(!(focusName.includes('Guest_')) && !(isNaN(parseInt(focusName.split('_')[1])))) logProfile('https://krunker.io/social.html?p=profile&q=' + focusName + '\n');
 }
 
 function altfocusPlayer(focusName, focusID) {
@@ -502,22 +549,22 @@ function altfocusPlayer(focusName, focusID) {
 		console.log('divs1');
 		specHighlighter(divs1);
 	}
-	console.log('contr display');
+	/*console.log('contr display');
 	document.getElementById('specKPDContr').style.display = 'block';
 	document.getElementById('specKRHid').style.display = 'block';
 	document.getElementById('specKPDTxt').innerHTML = 'Is ' + suspect + ' hacking?';
 	console.log('kpd text edited focus');
-	document.addEventListener('keydown', banHandler);
+	document.addEventListener('keydown', banHandler);*/
 }
 
-function banHandler(e) {
+/*function banHandler(e) {
 	console.log('banfunc eventlistener ' + e.key);
 		if(document.activeElement.tagName === 'INPUT') return;
 		switch(e.key) {
 			case 'y':
 				flagPlayerConfirmed(suspectID);
 				banPlayerConfirmed(suspectID);
-				if(!(/^Guest_[0-9]$/.test(suspect))) logProfile('https://krunker.io/social.html?p=profile&q=' + suspect);
+				if(!(suspect.includes('Guest_')) && !(isNaN(parseInt(suspect.split('_')[1])))) logProfile('https://krunker.io/social.html?p=profile&q=' + suspect + '\n');
 				unfocusPlayer();
 				break;
 
@@ -526,13 +573,12 @@ function banHandler(e) {
 				unfocusPlayer();
 				break;
 		}
-		toggleSpect(false);
-}
+}*/
 
 function unfocusPlayer() {
 	console.log('unfocusPlayer');
 	window.clearInterval(window.focusInterval);
-	document.removeEventListener('keydown', banHandler);
+	//document.removeEventListener('keydown', banHandler);
 	document.getElementById('specKPDContr').style.display = 'none';
 	genChatMsg('Suspect removed: ' + suspect);
 	let divs0 = document.getElementsByClassName('specPlayerHolder0');
