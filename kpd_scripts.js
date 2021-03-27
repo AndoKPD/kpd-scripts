@@ -382,10 +382,7 @@ function execCopy(elem) {
 /*---------------------------------------------------------------------------Spectate QOL---------------------------------------------------------------------------*/
 
 const specObserver = new MutationObserver(() => {
-	if(window.focusInterval != undefined && window.focusInterval != 'undefined'){
-		window.clearInterval(window.focusInterval);
-		console.log('focusInterval cleared');
-	}
+	suspectObserver.disconnect();
 	console.log('spec mutation observed');
 	let divs0 = document.getElementsByClassName('specPlayerHolder0');
 	let divs1 = document.getElementsByClassName('specPlayerHolder1');
@@ -398,6 +395,15 @@ const specObserver = new MutationObserver(() => {
 		specHighlighter(divs1);
 	}
 });
+
+const suspectObserver = new MutationObserver((mutationList) => {
+	console.log('suspect observer');
+	mutationList.forEach(function(mutation) {
+		if(mutation.oldValue == 'specPlayerIcon silhouette') focusPlayer(mutation.target.parentElement.childNodes[3].innerHTML);
+	});
+});
+
+
 
 function specHighlighter(divs) {
 	if(suspect == null) return;
@@ -419,7 +425,8 @@ function specHighlighter(divs) {
 				divs[i].childNodes[5].innerHTML = 'search';
 			} 
 			if(localStorage.getItem('suspectFocus') != null) {
-				window.focusInterval = setInterval(function() { console.log(divs[i].childNodes[3].innerHTML); focusPlayer(divs[i].childNodes[3].innerHTML); }, 1000);	
+				suspectObserver.observe(divs[i].firstChild, { attributes: true, attributeOldValue: true, attributeFilter: ['class'] });
+				focusPlayer(divs[i].childNodes[3].innerHTML);
 			}
 			console.log('suspect found');
 		}
@@ -536,7 +543,10 @@ function altfocusPlayer(focusName, focusID) {
 	suspectID = focusID;
 	genChatMsg('Suspect set: ' + suspect);
 	toggleSpect(true);
-	showWindow(0);
+	showWindow(23);
+	let clickEvent = document.createEvent('MouseEvents');
+    clickEvent.initEvent ('mousedown', true, true);
+    document.getElementsByTagName('canvas')[4].dispatchEvent (clickEvent);
 	let divs0 = document.getElementsByClassName('specPlayerHolder0');
 	let divs1 = document.getElementsByClassName('specPlayerHolder1');
 	if(divs0.length != 0) {
@@ -575,7 +585,7 @@ function altfocusPlayer(focusName, focusID) {
 
 function unfocusPlayer() {
 	console.log('unfocusPlayer');
-	window.clearInterval(window.focusInterval);
+	suspectObserver.disconnect();
 	//document.removeEventListener('keydown', banHandler);
 	document.getElementById('specKPDContr').style.display = 'none';
 	genChatMsg('Suspect removed: ' + suspect);
@@ -595,6 +605,7 @@ function unfocusPlayer() {
 	document.exitPointerLock();
 	showWindow(23);
 	showWindow(23);
+	toggleSpect(false);
 }
 
 function stopHighlight(divs) {
@@ -656,10 +667,7 @@ function getGameRegion() {
 }
 
 function remSessStorage() {
-	if(window.focusInterval != undefined && window.focusInterval != 'undefined'){
-		window.clearInterval(window.focusInterval);
-		console.log('focusInterval cleared');
-	}
+	suspectObserver.disconnect();
 	sessionStorage.removeItem('caller');
 	sessionStorage.removeItem('suspect');
 	sessionStorage.removeItem('suspectLVL');
@@ -690,6 +698,8 @@ function openLink () {
 function openKPDMenu() {
 	if(document.activeElement.tagName === 'INPUT') return;
 	document.exitPointerLock();
+	showWindow(1);
+	showWindow(1);
 	setTimeout( function() { shoPolicePop(); }, 200);
 }
 
@@ -704,10 +714,7 @@ function toggleFocus() {
         focusState = false;
 	} else {
 		localStorage.removeItem('suspectFocus');
-		if(window.focusInterval != undefined && window.focusInterval != 'undefined'){
-			window.clearInterval(window.focusInterval);
-			console.log('focusInterval cleared');
-		}	
+		suspectObserver.disconnect();
 		genChatMsg('Suspect focus is off');
         console.log('off');
         focusState = true;
@@ -980,6 +987,18 @@ module.exports = {
 				suspectLVL = sessionStorage.getItem('suspectLVL');
 				caller = sessionStorage.getItem('caller');
 				sessionStorage.removeItem('kpdJoin');
+				let clickEvent = document.createEvent('MouseEvents');
+				clickEvent.initEvent ('mousedown', true, true);
+				let kpdSpawn = window.setInterval(function() {
+					console.log('kpdJoinInterval')
+					if(document.getElementById('uiBase').className == '') {
+						return;
+					} else if(document.getElementById('uiBase').className == 'onMenu'){
+						document.getElementsByTagName('canvas')[4].dispatchEvent(clickEvent);
+					} else {
+						window.clearInterval(kpdSpawn);
+					}
+				}, 100);
 			} else {
 				suspect = null;
 				suspectLVL = null;
@@ -987,7 +1006,7 @@ module.exports = {
 				remSessStorage();
 			}
 			if(localStorage.getItem('username') == null) {
-				var timer = window.setInterval(function() {
+				let timer = window.setInterval(function() {
 					if (document.getElementById('menuAccountUsername').innerHTML != '?') {
 						window.clearInterval(timer);
 						showWindow(5);
