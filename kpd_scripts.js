@@ -14,6 +14,7 @@ const detailedPath = os.homedir() + '\\Documents\\KPD\\detailed_log.txt';
 let senior = false;
 let detailedLog = false;
 let autoOpenMenu = false;
+let persistentClipboard = false;
 let minLVL = 75;
 let highlightColor = '#63de26';
 let antiHighlightColor = '#fc3232';
@@ -30,6 +31,8 @@ let gameRegion;
 let kpdJoin = false;
 let frozen = false;
 let oldTr;
+let oldDate;
+let oldClipboard;
 
 /*---------------------------------------------------------------------------Chat Message Generation---------------------------------------------------------------------------*/
 
@@ -219,7 +222,7 @@ const kpdObserver = new MutationObserver(() => {
 				let node = genSearchBar(activeTab);
 				addSearchBar(node);
 			}
-			copyInit();
+			banlogInit();
 		} else {
 			if(!document.getElementById('kpdSearch')) {
 				let node = genSearchBar(activeTab);
@@ -358,17 +361,67 @@ function addRegion(joinButton) {
 	}
 }
 
-function copyInit(){
-	console.log('copyInit');
+function banlogInit(){
+	console.log('banlogInit');
 	if(document.getElementById('kpdCalls').childNodes[0].childNodes.length == 6) { //if data is present
 		let divs = document.getElementById('kpdCalls').childNodes;
 		for(let i = 0; i < divs.length; i++){
 			divs[i].childNodes[0].oncontextmenu = function() { execCopy(divs[i].childNodes[0])	}
 			divs[i].childNodes[4].oncontextmenu = function() { execCopy(divs[i].childNodes[4])	}
+			divs[i].onmouseover = function() {
+				oldDate = divs[i].lastChild.innerHTML;
+				let currentDate = new Date();
+				let currentUTC = new Date(currentDate.getTime() + currentDate.getTimezoneOffset() * 60000);
+				let logDate = new Date(oldDate)
+				divs[i].lastChild.innerHTML = minsToTimeString((currentUTC - logDate) / 1000 / 60);
+			}
+			divs[i].onmouseout = function() {
+				divs[i].lastChild.innerHTML = oldDate;
+			}
 		}
 	}else {
-		setTimeout(copyInit, 20); //try again
+		setTimeout(banlogInit, 20); //try again
 	}	
+}
+
+function minsToTimeString(minutes) {
+	let m1 = parseInt(minutes);
+	if (isNaN(m1)) m1 = 0;
+	let t3 = Math.floor(m1);
+	let t4= Math.floor(t3/1440);
+	let t5= t3-(t4*1440);
+	let t6= Math.floor(t5/60);
+	let t7= t5-(t6*60);
+
+	return getDateString(t4, t6, t7);
+}
+
+function getDateString(days, hours, minutes) {
+	let dayString = days + ' days';
+	let hourString = hours + ' hours';
+	let minuteString = minutes + ' minutes';
+
+	if(days == 0) {
+		dayString = '';
+	}
+
+	if(hours == 0) {
+		hourString = '';
+	}
+
+	if(days == 1) {
+		dayString = dayString.slice(0, -1);
+	}
+
+	if(hours == 1) {
+		hourString = hourString.slice(0, -1);
+	}
+
+	if(minutes == 1) {
+		minuteString = minuteString.slice(0, -1);
+	}
+
+	return 'Tagged ' + dayString + ' ' + hourString + ' ' + minuteString + ' ago';
 }
 
 function execCopy(elem) {
@@ -642,6 +695,18 @@ const callInfoObserver = new MutationObserver(() => {
 				remSessStorage();
 				openURL('/social.html?p=profile&q='+suspect);
 			}
+			if(persistentClipboard) {
+				let clipboardInterval = window.setInterval(function() {
+					console.log('clipboardInterval ' + oldClipboard)
+					if(clipboard.readText() == oldClipboard) {
+						return;
+					} else {
+						console.log('else');
+						window.clearInterval(clipboardInterval);
+						clipboard.writeText(oldClipboard);
+					}
+				}, 10);
+			}
 		}
 	}else if(document.getElementById('specKPDTxt').innerHTML == 'Case submitted!') {
 		console.log('not cheating');
@@ -654,6 +719,8 @@ const callInfoObserver = new MutationObserver(() => {
 		document.getElementById('specKRHid').childNodes[3].innerHTML = gameRegion;
 		document.getElementById('specKRHid').childNodes[3].id = 'specKPDRegion';
 		document.getElementById('specKRHid').childNodes[3].setAttribute('style', 'width: auto; display: inline-block; color: white; margin-left: 15px;');
+	} else if(document.getElementById('specKPDTxt').innerHTML.includes('Are you 100% sure?') && persistentClipboard) {
+		oldClipboard = clipboard.readText();
 	}
 });
 
@@ -854,6 +921,17 @@ module.exports = {
             html: function() { return clientUtil.genCSettingsHTML(this) },
             set: value => {
                 autoOpenMenu = value;
+            }
+		},
+		persistentClipboard: {
+			name: 'Persistent Clipboard',
+			id: 'persistentClipboard',
+			cat: 'KPD',
+			type: 'checkbox',
+			val: false,
+            html: function() { return clientUtil.genCSettingsHTML(this) },
+            set: value => {
+                persistentClipboard = value;
             }
 		},
         suspectFocus: {
