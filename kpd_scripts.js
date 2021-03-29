@@ -33,6 +33,7 @@ let frozen = false;
 let oldTr;
 let oldDate;
 let oldClipboard;
+let banMap = new Map();
 
 /*---------------------------------------------------------------------------Chat Message Generation---------------------------------------------------------------------------*/
 
@@ -141,8 +142,6 @@ function applyCSS() {
 						}
 						.punishButton.kpd {
 							background-color: #414a6d;
-							float: left;
-							margin-top: 0px;
 							position: relative;
 						}
 						.pListName {
@@ -497,7 +496,10 @@ function focusPlayer(number) {
 const menuObserver = new MutationObserver(() => {
 	console.log('menu observing');
 	if(document.getElementById('menuWindow').outerHTML.includes('Player List')) {
-		document.getElementById('menuWindow').firstChild.insertBefore(genDiv(), document.getElementById('menuWindow').firstChild.childNodes[2]);
+		document.getElementById('menuWindow').firstChild.insertBefore(genFreezeSpan(), document.getElementById('menuWindow').firstChild.childNodes[2]).style.marginTop = '8px';
+		document.getElementById('menuWindow').firstChild.insertBefore(genTagSpan(), document.getElementById('menuWindow').firstChild.childNodes[2]).style.marginTop = '8px';
+		document.getElementById('menuWindow').firstChild.insertBefore(document.createElement('br'), document.getElementById('menuWindow').firstChild.childNodes[2]);
+		document.getElementById('menuWindow').firstChild.insertBefore(document.createElement('br'), document.getElementById('menuWindow').firstChild.lastChild);
 		if(frozen) {
 			console.log('menu frozen');
 			document.getElementById('menuWindow').lastChild.firstChild.remove();
@@ -521,31 +523,56 @@ const menuObserver = new MutationObserver(() => {
 				}
 							
 				if(tmpSuspect == suspect) {
-					tempSpec.childNodes[0].innerHTML = 'visibility_off';
+					tempSpec.firstChild.innerHTML = 'visibility_off';
 					tempSpec.style.color = 'red';
 					tempSpec.onclick = function() { unfocusPlayer(); tempSpec.childNodes[0].innerHTML = 'visibility'; };
-					tempSpec.style.left = '-2px';
-					tempPunish.style.left = '-2px';
-					tempPunish.style.backgroundColor = antiHighlightColor;
-					trList[i].style.border = '3px solid ' + antiHighlightColor;
+					trList[i].style.outline = '3px solid ' + antiHighlightColor;
 				} else {
 					tempSpec.onclick = function() { altfocusPlayer(tmpSuspect, tmpID) };
 				}
-				tempPunish.onclick = function() { aioPunish(tmpSuspect, tmpID); };
+
+				if(banMap.has(tmpSuspect)) {
+					tempPunish.firstChild.setAttribute('style', 'color: ' + antiHighlightColor + ' !important;');
+					tempPunish.firstChild.innerHTML = 'person_remove_alt_1';
+					tempPunish.onclick = function() { banMap.delete(tmpSuspect); showWindow(23); showWindow(23); };
+				} else {
+					tempPunish.firstChild.style.color = 'inherit';
+					tempPunish.firstChild.innerHTML = 'person_add_alt_1';
+					tempPunish.onclick = function() { banMap.set(tmpSuspect, tmpID); showWindow(23); showWindow(23); };	
+				}
 			}
 			oldTr = document.getElementById('menuWindow').lastChild.firstChild;
 		}
 	}  
 });
 
-function genDiv() {
-	let divElem = document.createElement('div');
-	if(frozen) divElem.innerHTML = 'Unfreeze';
-	else divElem.innerHTML = 'Freeze';
-    divElem.id = 'freezeMenu';
-    divElem.onclick = () => freeze();
-	return divElem;
+function genFreezeSpan() {
+	let spanBtn = document.createElement('span');
+	let spanText = document.createElement('span');
+	spanBtn.id = 'freezeMenu';
+	spanBtn.className = 'punishButton kpd';
+	spanText.className = 'takeAction';
+	if(frozen) spanText.innerHTML = 'Unfreeze';
+	else spanText.innerHTML = 'Freeze';
+	spanBtn.onmouseenter = function() { playTick(); };
+    spanBtn.onclick = () => freeze();
+	spanBtn.appendChild(spanText);
+	return spanBtn;
 }
+
+function genTagSpan() {
+	let spanBtn = document.createElement('span');
+	let spanIcon = document.createElement('span');
+	spanBtn.id = 'tagMenu';
+	spanBtn.className = 'punishButton kpd';
+	spanIcon.className = 'takeAction';
+	spanIcon.innerHTML = 'Tag';
+	spanBtn.onmouseenter = function() { playTick(); };
+    spanBtn.onclick = function() { multiPunish(); }
+	spanBtn.appendChild(spanIcon);
+	return spanBtn;
+}
+
 
 function genSpecButton() {
 	let spanBtn = document.createElement('span');
@@ -563,7 +590,7 @@ function genPunishButton() {
 	let spanIcon = document.createElement('span');
 	spanBtn.className = 'punishButton kpd';
 	spanIcon.className = 'takeAction material-icons';
-	spanIcon.innerHTML = 'delete';
+	spanIcon.innerHTML = 'person_add_alt_1';
 	spanBtn.onmouseenter = function() { playTick(); };
 	spanBtn.appendChild(spanIcon);
 	return spanBtn;
@@ -582,10 +609,27 @@ function freeze() {
 	}
 }
 
-function aioPunish(focusName, focusID) {
-	flagPlayerConfirmed(focusID);
-	banPlayerConfirmed(focusID);
-	if(!(focusName.includes('Guest_')) && !(isNaN(parseInt(focusName.split('_')[1])))) logProfile('https://krunker.io/social.html?p=profile&q=' + focusName + '\n');
+function multiPunish() {
+	let i = -1;
+	if(banMap.size == 0 && suspect == null) {
+		genChatMsg('List empty');
+		return;
+	} else if(banMap.size == 0 && suspect != null) {
+		multiTagHandler(suspect, suspectID);
+		return;
+	}
+	banMap.forEach(function(value, key) {
+		i++;
+		setTimeout(function() { multiTagHandler(key, value) }, i * 200);
+	});
+}
+
+function multiTagHandler(name, id) {
+	console.log('tag');
+	flagPlayerConfirmed(id);
+	banPlayerConfirmed(id);
+	if(!(name.includes('Guest_')) && !(isNaN(parseInt(name.split('_')[1])))) logProfile('https://krunker.io/social.html?p=profile&q=' + name + '\n');
+	banMap.delete(name);
 }
 
 function altfocusPlayer(focusName, focusID) {
