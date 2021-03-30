@@ -628,7 +628,11 @@ function multiTagHandler(name, id) {
 	console.log('tag');
 	flagPlayerConfirmed(id);
 	banPlayerConfirmed(id);
-	if(!(name.includes('Guest_')) && !(isNaN(parseInt(name.split('_')[1])))) logProfile('https://krunker.io/social.html?p=profile&q=' + name + '\n');
+	if(!(name.includes('Guest_'))) {
+		if(isNaN(parseInt(name.split('_')[1]))) {
+			logProfile('https://krunker.io/social.html?p=profile&q=' + name + '\n');
+		}
+	}
 	banMap.delete(name);
 }
 
