@@ -35,6 +35,7 @@ let oldTr;
 let oldDate;
 let oldClipboard;
 let banMap = new Map();
+let minLevelCap = 15;
 
 /*---------------------------------------------------------------------------Chat Message Generation---------------------------------------------------------------------------*/
 
@@ -283,7 +284,7 @@ function highlight() { //highlights calls
 		for(let i = 0; i < lvl.length; i++){
 			if(lvl[i].childNodes[1].innerHTML >= minLVL) lvl[i].childNodes[1].style.color = highlightColor; //highlight the number
 			if(senior || executive) {
-				if(lvl[i].childNodes[4].innerHTML < 15) {
+				if(lvl[i].childNodes[4].innerHTML < minLevelCap) {
 					console.log('highlighting green');
 					lvl[i].childNodes[4].style.color = highlightColor;
 				} else {
@@ -730,28 +731,12 @@ const callInfoObserver = new MutationObserver(() => {
 	if(!kpdJoin) return;
 	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
 		if(suspect != null && suspectLVL != null && caller != null) {
-			if(executive) {
-				if(suspectLVL < 20) {
-					const text = 'https://krunker.io/social.html?p=profile&q=' + suspect + '\n';
-					logProfile(text);
-					remSessStorage();
-					if(autoOpenMenu) openKPDMenu();
-				} else {
-					remSessStorage();
-					openURL('/social.html?p=profile&q='+suspect);
-				}
-			}
-			if(senior) {
-				if(suspectLVL < 15) {
-					const text = 'https://krunker.io/social.html?p=profile&q=' + suspect + '\n';
-					logProfile(text);
-					remSessStorage();
-					if(autoOpenMenu) openKPDMenu();
-				} else {
-					remSessStorage();
-					openURL('/social.html?p=profile&q='+suspect);
-				}
-			} else  {
+			if(executive && suspectLVL < 20 || senior && suspectLVL < 15) {
+				const text = 'https://krunker.io/social.html?p=profile&q=' + suspect + '\n';
+				logProfile(text);
+				remSessStorage();
+				if(autoOpenMenu) openKPDMenu();
+			} else {
 				remSessStorage();
 				openURL('/social.html?p=profile&q='+suspect);
 			}
@@ -894,7 +879,12 @@ module.exports = {
             html: function() { return clientUtil.genCSettingsHTML(this) },
             set: value => {
                 executive = value;
-				if(executive) senior = false;
+				if(executive) {
+					senior = false;
+					minLevelCap = 20;
+				} else {
+					minLevelCap = 15;
+				}
             }
 		},
         kpdMenuQOL: {
