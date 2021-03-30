@@ -12,6 +12,7 @@ const detailedPath = os.homedir() + '\\Documents\\KPD\\detailed_log.txt';
 
 /*User Set*/
 let senior = false;
+let executive = false;
 let detailedLog = false;
 let autoOpenMenu = false;
 let persistentClipboard = false;
@@ -179,7 +180,6 @@ function webhookLog(text) {
 	  avatar_url: sessionStorage.getItem('webhookPfp'),
 	  content: text
 	}
-
 	request.send(JSON.stringify(params));
   }
 
@@ -237,7 +237,7 @@ function determineActiveTab(kpdHolder) {
 		if(kpdHolder.children[2].children[0].className == 'menuTabNew tabANew') return 1;
 		else if(kpdHolder.children[2].children[1].className == 'menuTabNew tabANew') return 2;
 		return 0;
-	}else {
+	} else {
 		setTimeout(highlight, 20); //try again
 	}
 }
@@ -259,8 +259,7 @@ function searchCalls() {
 			cLevel.includes(inputVal) || sLevel.includes(inputVal) || 
 			timeAgo.includes(inputVal) || region.toLowerCase().includes(inputVal.toLowerCase())) { 
 				divs[i].style.display='block';			
-			} 
-			else { 
+			} else { 
 				divs[i].style.display='none';        
 			} 
 		}
@@ -731,6 +730,17 @@ const callInfoObserver = new MutationObserver(() => {
 	if(!kpdJoin) return;
 	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
 		if(suspect != null && suspectLVL != null && caller != null) {
+			if(executive) {
+				if(suspectLVL < 20) {
+					const text = 'https://krunker.io/social.html?p=profile&q=' + suspect + '\n';
+					logProfile(text);
+					remSessStorage();
+					if(autoOpenMenu) openKPDMenu();
+				} else {
+					remSessStorage();
+					openURL('/social.html?p=profile&q='+suspect);
+				}
+			}
 			if(senior) {
 				if(suspectLVL < 15) {
 					const text = 'https://krunker.io/social.html?p=profile&q=' + suspect + '\n';
@@ -741,7 +751,7 @@ const callInfoObserver = new MutationObserver(() => {
 					remSessStorage();
 					openURL('/social.html?p=profile&q='+suspect);
 				}
-			} else {
+			} else  {
 				remSessStorage();
 				openURL('/social.html?p=profile&q='+suspect);
 			}
@@ -873,6 +883,18 @@ module.exports = {
             html: function() { return clientUtil.genCSettingsHTML(this) },
             set: value => {
                 senior = value;
+            }
+		},
+		executiveSet: {
+			name: 'Executive Officer',
+			id: 'executive',
+			cat: 'KPD',
+			type: 'checkbox',
+			val: false,
+            html: function() { return clientUtil.genCSettingsHTML(this) },
+            set: value => {
+                executive = value;
+				if(executive) senior = false;
             }
 		},
         kpdMenuQOL: {
