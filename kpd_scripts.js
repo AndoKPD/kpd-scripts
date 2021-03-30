@@ -282,7 +282,7 @@ function highlight() { //highlights calls
 		let lvl = document.getElementById('kpdCalls').childNodes;
 		for(let i = 0; i < lvl.length; i++){
 			if(lvl[i].childNodes[1].innerHTML >= minLVL) lvl[i].childNodes[1].style.color = highlightColor; //highlight the number
-			if(senior) {
+			if(senior || executive) {
 				if(lvl[i].childNodes[4].innerHTML < 15) {
 					console.log('highlighting green');
 					lvl[i].childNodes[4].style.color = highlightColor;
