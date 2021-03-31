@@ -1137,6 +1137,11 @@ module.exports = {
 						document.getElementsByTagName('canvas')[4].dispatchEvent(clickEvent);
 					} else {
 						window.clearInterval(kpdSpawn);
+						if(suspectLVL < 15) {
+							for(let i = 0; i < 9; i++) {
+								setTimeout(function() { genChatMsg(8-i) }, i*1000);
+							}
+						}
 					}
 				}, 100);
 			} else {
