@@ -1139,7 +1139,7 @@ module.exports = {
 						window.clearInterval(kpdSpawn);
 						if(suspectLVL < 15) {
 							for(let i = 0; i < 8; i++) {
-								setTimeout(function() { genChatMsg(7-i) }, i*1000);
+								setTimeout(function() { genChatMsg(7-i) }, i*1080);
 							}
 						}
 					}
