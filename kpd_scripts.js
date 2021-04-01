@@ -1137,7 +1137,7 @@ module.exports = {
 						document.getElementsByTagName('canvas')[4].dispatchEvent(clickEvent);
 					} else {
 						window.clearInterval(kpdSpawn);
-						if(suspectLVL < 15) {
+						if(suspectLVL < 20) {
 							for(let i = 0; i < 8; i++) {
 								setTimeout(function() { genChatMsg(7-i) }, i*1080);
 							}
