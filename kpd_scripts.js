@@ -88,7 +88,6 @@ function applyCSS() {
 						}
 						#kpdSearch {
 							background-color: transparent;
-							box-shadow: 0 0 7px 1px var(--accent);
 							padding: 4px;
 							width: 100%;
 							text-align: left;
@@ -495,7 +494,7 @@ function focusPlayer(number) {
 
 const menuObserver = new MutationObserver(() => {
 	console.log('menu observing');
-	if(document.getElementById('menuWindow').outerHTML.includes('Player List')) {
+	if(document.getElementById('menuWindow').firstChild.outerHTML.includes('Player List')) {
 		document.getElementById('menuWindow').firstChild.insertBefore(genFreezeSpan(), document.getElementById('menuWindow').firstChild.childNodes[2]).style.marginTop = '8px';
 		document.getElementById('menuWindow').firstChild.insertBefore(genTagSpan(), document.getElementById('menuWindow').firstChild.childNodes[2]).style.marginTop = '8px';
 		document.getElementById('menuWindow').firstChild.insertBefore(document.createElement('br'), document.getElementById('menuWindow').firstChild.childNodes[2]);
@@ -850,6 +849,14 @@ function toggleXray() {
 	}
 }
 
+/*---------------------------------------------------------------------------Case Resolved Detector---------------------------------------------------------------------------*/
+
+const caseObserver = new MutationObserver(() => {
+	if(document.getElementById('instuctionsUpdate').outerHTML.includes('Case Resolved')) {
+		window.location.href = "https://krunker.io/";
+	}
+});
+
 /*---------------------------------------------------------------------------Modules---------------------------------------------------------------------------*/
 
 module.exports = {
@@ -994,6 +1001,20 @@ module.exports = {
             html: function() { return clientUtil.genCSettingsHTML(this) },
             set: value => {
                 persistentClipboard = value;
+            }
+		},
+		caseResolvedRefresh: {
+			name: 'Refresh when Case Resolved',
+			id: 'caseResolvedRefresh',
+			cat: 'KPD',
+			type: 'checkbox',
+			val: true,
+            html: function() { return clientUtil.genCSettingsHTML(this) },
+            set: value => {
+                if(value) {
+					return caseObserver.observe(instructionsUpdate, { childList: true });
+				}
+				caseObserver.disconnect();
             }
 		},
         suspectFocus: {
