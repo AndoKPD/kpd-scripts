@@ -852,7 +852,7 @@ function toggleXray() {
 /*---------------------------------------------------------------------------Case Resolved Detector---------------------------------------------------------------------------*/
 
 const caseObserver = new MutationObserver(() => {
-	if(document.getElementById('instuctionsUpdate').outerHTML.includes('Case Resolved')) {
+	if(document.getElementById('instructionsUpdate').outerHTML.includes('Case already Resolved')) {
 		window.location.href = "https://krunker.io/";
 	}
 });
