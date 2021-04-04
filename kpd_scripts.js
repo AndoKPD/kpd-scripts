@@ -1014,7 +1014,7 @@ module.exports = {
 			id: 'linkOpener',
 			cat: 'KPD',
 			type: 'checkbox',
-			val: true,
+			val: false,
 			html: function () { return window.clientUtil.genCSettingsHTML(this) },
 			set: value => {
 				let linkOpener = document.getElementById('linkOpener')
