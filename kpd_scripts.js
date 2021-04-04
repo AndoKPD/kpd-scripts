@@ -450,7 +450,15 @@ const specObserver = new MutationObserver(() => {
 const suspectObserver = new MutationObserver((mutationList) => {
 	console.log('suspect observer');
 	mutationList.forEach(function(mutation) {
-		if(mutation.oldValue == 'specPlayerIcon silhouette') focusPlayer(mutation.target.parentElement.childNodes[3].innerHTML);
+		if(mutation.oldValue == 'specPlayerIcon silhouette') {
+			let specNr = mutation.target.parentElement.childNodes[3].innerHTML;
+			console.log('specNr ' + specNr);
+			if(specNr == '') {
+				clickToPlayer(mutation.target.parentElement);
+			} else {
+				focusPlayer(specNr);
+			}
+		}
 	});
 });
 
@@ -477,7 +485,15 @@ function specHighlighter(divs) {
 			} 
 			if(localStorage.getItem('suspectFocus') != null) {
 				suspectObserver.observe(divs[i].firstChild, { attributes: true, attributeOldValue: true, attributeFilter: ['class'] });
-				focusPlayer(divs[i].childNodes[3].innerHTML);
+				if(divs[i].firstChild.className != 'specPlayerIcon') break;
+				let specNr = divs[i].childNodes[3].innerHTML;
+				console.log('specNr ' + specNr);
+				if(specNr == '') {
+					clickToPlayer(divs[i]);
+				} else {
+					focusPlayer(specNr);
+				}
+				
 			}
 			console.log('suspect found');
 		}
@@ -488,6 +504,15 @@ function focusPlayer(number) {
 	console.log('focussing player ' + number);
 	let keycode = 48 + parseInt(number);
 	pressButton(keycode);
+}
+
+function clickToPlayer(elem) {
+	for(let i = 0; i < 100; i++) {
+		setTimeout(() => {
+			if(elem.childNodes[4].getAttribute('style').includes('display: inline-block;')) return;
+			if(elem.childNodes[4].getAttribute('style').includes('display: none;')) spectMode(1);
+		}, i * 5);
+	}
 }
 
 /*---------------------------------------------------------------------------Alt Menu Buttons---------------------------------------------------------------------------*/
@@ -512,6 +537,7 @@ const menuObserver = new MutationObserver(() => {
 				let tempPunish = trList[i].insertBefore(genPunishButton(), trList[i].firstChild);
 				let tempSpec = trList[i].insertBefore(genSpecButton(), trList[i].firstChild);
 				let tmpSuspect;
+				let tmpSuspectName;
 				let tmpID;
 				if(document.getElementsByClassName('pListName')[i].childNodes[0].tagName != 'A') {
 					tmpSuspect = document.getElementsByClassName('pListName')[i].childNodes[1].getAttribute('href').split('=').reverse()[0];
@@ -520,14 +546,19 @@ const menuObserver = new MutationObserver(() => {
 					tmpSuspect = document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('href').split('=').reverse()[0];
 					tmpID = document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('oncontextmenu').split('"')[1];
 				}
+				if(document.getElementsByClassName('pListName')[i].innerText.includes('[')) {
+					tmpSuspectName = document.getElementsByClassName('pListName')[i].innerText.split('[')[0].slice(0, -1);
+				} else {
+					tmpSuspectName = document.getElementsByClassName('pListName')[i].innerText;
+				}
 							
-				if(tmpSuspect == suspect) {
+				if(tmpSuspectName == suspect) {
 					tempSpec.firstChild.innerHTML = 'visibility_off';
 					tempSpec.style.color = 'red';
 					tempSpec.onclick = function() { unfocusPlayer(); tempSpec.childNodes[0].innerHTML = 'visibility'; };
 					trList[i].style.outline = '3px solid ' + antiHighlightColor;
 				} else {
-					tempSpec.onclick = function() { altfocusPlayer(tmpSuspect, tmpID) };
+					tempSpec.onclick = function() { altfocusPlayer(tmpSuspectName, tmpID) };
 				}
 
 				if(banMap.has(tmpSuspect)) {
@@ -804,6 +835,17 @@ function openLink () {
 	document.getElementById("linkInput").value = '';
 }
 
+function altOpenLink () {
+	let clipContent = clipboard.readText();
+	if(clipContent.includes('https://krunker.io/social.html?p=profile&q=')) openProfLink(clipContent.slice(43));
+	else {
+		if (clipContent != '') {
+		  if(clipContent.length > 43) openProfLink(clipContent.slice(43));
+		  else openProfLink(clipContent);
+		}
+	}
+}
+
 /*---------------------------------------------------------------------------Open KPD---------------------------------------------------------------------------*/
 
 function openKPDMenu() {
@@ -855,6 +897,19 @@ const caseObserver = new MutationObserver(() => {
 	if(document.getElementById('instructionsUpdate').outerHTML.includes('Case already Resolved')) {
 		window.location.href = "https://krunker.io/";
 	}
+});
+
+/*---------------------------------------------------------------------------Counter Hider---------------------------------------------------------------------------*/
+
+const counterObserver = new MutationObserver((mutationList) => {
+	console.log('counter observer');
+	mutationList.forEach(function(mutation) {
+		if(mutation.oldValue == 'display: none;') {
+			document.getElementById('topRight').childNodes[4].style.display = 'none';
+		} else {
+			document.getElementById('topRight').childNodes[4].style.display = 'block';
+		}
+	});
 });
 
 /*---------------------------------------------------------------------------Modules---------------------------------------------------------------------------*/
@@ -970,6 +1025,21 @@ module.exports = {
 				}
 			}
 		},
+		alternativeLinkOpener: {
+			name: 'Alternative Open Link',
+			id: 'alternativeLinkOpener',
+			cat: 'KPD',
+			type: 'checkbox',
+			val: true,
+			html: function () { return window.clientUtil.genCSettingsHTML(this) },
+			set: value => {
+				if(value) {
+					document.getElementById('policeButton').oncontextmenu = () => { altOpenLink(); };
+				} else {
+					document.getElementById('policeButton').oncontextmenu = () => { return false; };
+				}
+			}
+		},
 		detailedLog: {
 			name: 'Generate Detailed Logfile',
 			id: 'detailedLog',
@@ -1015,6 +1085,20 @@ module.exports = {
 					return caseObserver.observe(instructionsUpdate, { childList: true });
 				}
 				caseObserver.disconnect();
+            }
+		},
+		counterHider: {
+			name: 'Don\'t show Counters in spec',
+			id: 'counterHider',
+			cat: 'KPD',
+			type: 'checkbox',
+			val: true,
+            html: function() { return clientUtil.genCSettingsHTML(this) },
+            set: value => {
+                if(value) {
+					return counterObserver.observe(spectateUI, { attributes: true, attributeOldValue: true, attributeFilter: ['style'] });
+				}
+				counterObserver.disconnect();
             }
 		},
         suspectFocus: {
