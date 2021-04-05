@@ -99,24 +99,11 @@ function applyCSS() {
 							pointer-events: all;
 							margin-bottom: 10px;
 						}
-						.callRegion {
-							margin-right: 12px;
-                        }
                         #chatItem_toggle {
 							background-color: rgba(0, 0, 0, 0.4);
 						}
 						#chatMsg_toggle {
 							color: #fc03ec;
-						}
-						#specKPDCaller {
-							display: inline-block !important; 
-							color: rgb(19, 93, 216) !important;
-							font-size: 49px!important;
-							vertical-align: middle;
-							text-shadow: -1px -1px 0 #202020, 1px -1px 0 #202020, -1px 1px 0 #202020, 1px 1px 0 #202020;
-							position: absolute;
-							top: 1px;
-							left: 12px;
 						}
 						#specKPDSuspect {
 							display: inline-block !important; 
@@ -314,7 +301,6 @@ function joinButtonHook() {
 		console.log('hooking join button');
 		let jBtns = document.getElementsByClassName('policeJoinB');
 		for(let i = 0; i < jBtns.length; i++){
-			if(jBtns[i].parentElement.childNodes[1].className != 'callRegion') addRegion(jBtns[i]);
 			jBtns[i].onclick = function() { joinKPD(jBtns[i].getAttribute('onclick'), jBtns[i].parentElement.parentElement.childNodes[2].innerHTML, jBtns[i].parentElement.parentElement.childNodes[5].innerHTML, jBtns[i].parentElement.parentElement.childNodes[4].innerHTML) };
 		}
 	}else {
@@ -338,24 +324,6 @@ function addSearchBar(searchBar) {
 		console.log('insert');
 	} else {
 		setTimeout(function() { addSearchBar(searchBar) }, 20);
-	}
-}
-
-function genRegion(attrib) {
-	let span = document.createElement('span');
-	span.className = 'callRegion';
-	span.innerHTML = attrib;
-	console.log('generated region');
-	return span;
-}
-
-
-function addRegion(joinButton) {
-	if(joinButton.parentElement.childNodes[1].className != 'classRegion') {
-		let region = joinButton.getAttribute('onclick').slice(12).split(':')[0];
-		let regionSpan = genRegion(region);
-		joinButton.parentElement.insertBefore(regionSpan, joinButton.parentElement.childNodes[1]);
-		console.log('insert region');
 	}
 }
 
@@ -468,14 +436,7 @@ function specHighlighter(divs) {
 	if(suspect == null) return;
 	console.log('specHighlight');
 	for(let i = 0; i < divs.length; i++) {
-		if(divs[i].childNodes[2].innerHTML == caller) {
-			console.log('caller found');
-			divs[i].childNodes[2].style.color = '#135DD8';
-			divs[i].childNodes[2].style.textShadow = 'none';
-			divs[i].childNodes[5].innerHTML = 'call';
-			divs[i].childNodes[5].id = 'specKPDCaller';
-			divs[i].childNodes[0].setAttribute('style', 'outline: solid 4px #135DD8;')
-		}else if(divs[i].childNodes[2].innerHTML == suspect) {
+		if(divs[i].childNodes[2].innerHTML == suspect) {
 			divs[i].childNodes[2].style.color = '#c00000';
 			divs[i].childNodes[2].style.textShadow = 'none';
 			divs[i].childNodes[0].setAttribute('style', 'outline: solid 4px #c00000;')
@@ -1286,6 +1247,7 @@ module.exports = {
 			let inputElem = document.getElementById('menuClassContainer').appendChild(input);
 			divElem.oncontextmenu = function() { inputElem.value = clipboard.readText(); openLink(); };
 			inputElem.oncontextmenu = function() { inputElem.value = clipboard.readText(); };
+			document.getElementById('merchHolder').onclick = () => { return false; }
 		});
 	}
 }
