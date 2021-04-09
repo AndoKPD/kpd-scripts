@@ -507,8 +507,8 @@ const menuObserver = new MutationObserver(() => {
 					tmpSuspect = document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('href').split('=').reverse()[0];
 					tmpID = document.getElementsByClassName('pListName')[i].childNodes[0].getAttribute('oncontextmenu').split('"')[1];
 				}
-				if(document.getElementsByClassName('pListName')[i].innerText.includes('[')) {
-					tmpSuspectName = document.getElementsByClassName('pListName')[i].innerText.split('[')[0].slice(0, -1);
+				if(document.getElementsByClassName('pListName')[i].innerText.charAt(document.getElementsByClassName('pListName')[i].innerText.length - 6) == '[') {
+					tmpSuspectName = document.getElementsByClassName('pListName')[i].innerText.slice(0, -7);
 				} else {
 					tmpSuspectName = document.getElementsByClassName('pListName')[i].innerText;
 				}
@@ -518,6 +518,7 @@ const menuObserver = new MutationObserver(() => {
 					tempSpec.style.color = 'red';
 					tempSpec.onclick = function() { unfocusPlayer(); tempSpec.childNodes[0].innerHTML = 'visibility'; };
 					trList[i].style.outline = '3px solid ' + antiHighlightColor;
+					tempPunish.firstChild.innerHTML = 'person_remove_alt_1';
 				} else {
 					tempSpec.onclick = function() { altfocusPlayer(tmpSuspectName, tmpID) };
 				}
@@ -783,8 +784,18 @@ function openProfLink (suspect) {
 	window.open('https://krunker.io/social.html?p=profile&q=' + suspect)
 }
 
+function remove_non_ascii(str) {
+  
+	if ((str===null) || (str===''))
+		 return false;
+   else
+	 str = str.toString();
+	
+	return str.replace(/[^\x20-\x7E]/g, '');
+}
+
 function openLink () {
-	let clipContent = clipboard.readText();
+	let clipContent = remove_non_ascii(clipboard.readText());
 	let profLink = document.getElementById("linkInput").value;
 	if(clipContent.includes('https://krunker.io/social.html?p=profile&q=') && profLink.length == 0) openProfLink(clipContent.slice(43));
 	else {
@@ -797,7 +808,7 @@ function openLink () {
 }
 
 function altOpenLink () {
-	let clipContent = clipboard.readText();
+	let clipContent = remove_non_ascii(clipboard.readText());
 	if(clipContent.includes('https://krunker.io/social.html?p=profile&q=')) openProfLink(clipContent.slice(43));
 	else {
 		if (clipContent != '') {
