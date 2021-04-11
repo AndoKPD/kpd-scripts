@@ -721,7 +721,7 @@ function stopHighlight(divs) {
 const callInfoObserver = new MutationObserver(() => {
 	gameRegion = getGameRegion();
 	if(!kpdJoin) return;
-	if(document.getElementById('chatList').outerText.includes('Please Review this case for another')) return;
+	if(document.getElementById('chatList').lastChild.innerText.includes('Please Review this case for another')) return;
 	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
 		if(suspect != null && suspectLVL != null && caller != null) {
 			if(executive && suspectLVL < 20 || senior && suspectLVL < 15) {
