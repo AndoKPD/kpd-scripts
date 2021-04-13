@@ -1259,7 +1259,6 @@ module.exports = {
 			let inputElem = document.getElementById('menuClassContainer').appendChild(input);
 			divElem.oncontextmenu = function() { inputElem.value = clipboard.readText(); openLink(); };
 			inputElem.oncontextmenu = function() { inputElem.value = clipboard.readText(); };
-			document.getElementById('merchHolder').onclick = () => { return false; }
 		});
 	}
 }
