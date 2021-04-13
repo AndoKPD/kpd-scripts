@@ -1,4 +1,3 @@
-
 /*---------------------------------------------------------------------------By ando#6372---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------Constants---------------------------------------------------------------------------*/
@@ -95,7 +94,7 @@ function openAllReports() {
 	}
 }
 
-function divAppender (divElem) {
+function divAppender(divElem) {
 	if (document.getElementsByClassName('rightBottomHolder').length != 0) {
 		document.getElementsByClassName('rightBottomHolder')[0].appendChild(divElem);
 	} else {
@@ -106,7 +105,7 @@ function divAppender (divElem) {
 }
 
 
-function spanAppender (spanElem) {
+function spanAppender(spanElem) {
 	if (document.getElementsByClassName('rightTopHolder').length != 0) {
 		document.getElementsByClassName('rightTopHolder')[0].appendChild(spanElem);
 	} else {
@@ -115,6 +114,22 @@ function spanAppender (spanElem) {
 		}, 100);
 	}
 }
+
+function addLog() {
+	if (!!document.getElementById('flagBtn')) {
+		document.getElementById('flagBtn').onclick = function() {
+			flagPopup();
+			document.getElementById('flagPop').lastChild.onclick = function() {
+				flagUser();
+				writeToFile(logPath, 'https://krunker.io/social.html?p=profile&q=' + playerName + '\n');
+			}
+		}
+	} else {
+		setTimeout(addLog, 100);
+	}
+}
+
+
 
 /*---------------------------------------------------------------------------CSS Application---------------------------------------------------------------------------*/
 
@@ -194,6 +209,7 @@ module.exports = {
 			applyCSS();
 			spanAppender(span);
 			divAppender(div);
+			addLog();
 		});
 	}
 }
