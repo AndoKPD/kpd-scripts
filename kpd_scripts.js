@@ -27,7 +27,6 @@ let suspectLVL;
 let caller;
 let suspectID;
 let activeTab;
-let xrayState = true;
 let gameRegion;
 let kpdJoin = false;
 let frozen = false;
@@ -721,7 +720,6 @@ function stopHighlight(divs) {
 const callInfoObserver = new MutationObserver(() => {
 	gameRegion = getGameRegion();
 	if(!kpdJoin) return;
-	if(document.getElementById('chatList').lastChild.innerText.includes('Please Review this case for another')) return;
 	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
 		if(suspect != null && suspectLVL != null && caller != null) {
 			if(executive && suspectLVL < 20 || senior && suspectLVL < 15) {
@@ -852,12 +850,13 @@ function toggleFocus() {
 
 function toggleXray() {
 	if(document.activeElement.tagName === 'INPUT') return;
-	if(xrayState) {
+	let xrayState = localStorage.getItem('kro_setngss_hideNames');
+	if(xrayState == 3) {
 		setSetting('hideNames', 0);
 		genChatMsg('X-Ray is on');
         console.log('on');
         xrayState = false
-	} else {
+	} else if(xrayState == 0){
 		setSetting('hideNames', 3);
 		genChatMsg('X-Ray is off');
         console.log('off');
@@ -867,7 +866,7 @@ function toggleXray() {
 
 /*---------------------------------------------------------------------------Case Resolved Detector---------------------------------------------------------------------------*/
 
-const caseObserver = new MutationObserver(() => {
+const caseObserver = new MutationObserver(() => {	
 	if(document.getElementById('instructionsUpdate').outerHTML.includes('Case already Resolved')) {
 		window.location.href = "https://krunker.io/";
 	}
