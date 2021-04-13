@@ -454,6 +454,8 @@ function specHighlighter(divs) {
 					focusPlayer(specNr);
 				}
 				
+			} else {
+				genChatMsg('Suspect Focus is disabled');
 			}
 			console.log('suspect found');
 		}
@@ -895,7 +897,7 @@ module.exports = {
     locations: ['game'],
     settings: {
 		seniorSet: {
-			name: 'Senior',
+			name: 'Senior Officer',
 			id: 'senior',
 			cat: 'KPD',
 			type: 'checkbox',
