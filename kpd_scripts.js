@@ -723,7 +723,7 @@ const callInfoObserver = new MutationObserver(() => {
 	if(document.getElementById('specKPDTxt').innerHTML.includes('Profile URL')) {
 		if(suspect != null && suspectLVL != null && caller != null) {
 			if(executive && suspectLVL < 20 || senior && suspectLVL < 15) {
-				if(document.getElementById('chatList').outerText.includes(suspect + ' left the game')) openURL('/social.html?p=profile&q='+suspect);
+				if(document.getElementById('chatList').outerText.includes(suspect + ' left the game') || document.getElementById('chatList').outerText.includes(suspect + ' was vote kicked')) openURL('/social.html?p=profile&q=' + suspect);
 				const text = 'https://krunker.io/social.html?p=profile&q=' + suspect + '\n';
 				logProfile(text);
 				remSessStorage();
